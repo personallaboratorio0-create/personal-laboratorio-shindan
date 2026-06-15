@@ -27,15 +27,15 @@ header span{font-size:11px;color:var(--accent2);letter-spacing:.1em;font-family:
 
 /* 写真アップロード */
 .upload-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-.upload-area{border:1.5px dashed var(--border);border-radius:4px;padding:16px;text-align:center;cursor:pointer;transition:all .2s;position:relative;background:var(--bg);min-height:180px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;}
-.upload-area:hover,.upload-area.dragover{border-color:var(--accent);background:rgba(196,168,130,.08);}
-.upload-area.has-image{border-style:solid;border-color:var(--accent);}
-.upload-area input[type="file"]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.upload-box{border:1.5px dashed var(--border);border-radius:4px;padding:16px;text-align:center;background:var(--bg);min-height:180px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;position:relative;}
+.upload-box.has-image{border-style:solid;border-color:var(--accent);}
 .upload-icon{font-size:28px;opacity:.4;}
 .upload-label{font-size:13px;font-weight:400;}
 .upload-sub{font-size:11px;color:var(--accent2);font-family:"Noto Sans JP",sans-serif;}
 .preview-img{width:100%;max-height:200px;object-fit:contain;border-radius:2px;display:none;}
 .preview-img.visible{display:block;}
+.upload-btn{margin-top:8px;padding:7px 16px;background:var(--accent);color:var(--white);border:none;border-radius:3px;font-family:"Noto Sans JP",sans-serif;font-size:12px;cursor:pointer;}
+.upload-btn:hover{background:var(--accent2);}
 .upload-placeholder{display:flex;flex-direction:column;align-items:center;gap:6px;}
 .upload-placeholder.hidden{display:none;}
 .remove-btn{position:absolute;top:6px;right:6px;z-index:10;width:22px;height:22px;border-radius:50%;background:var(--accent2);color:white;border:none;cursor:pointer;font-size:10px;display:none;align-items:center;justify-content:center;}
@@ -155,28 +155,22 @@ header span{font-size:11px;color:var(--accent2);letter-spacing:.1em;font-family:
   <div class="card">
     <div class="card-title">写真をアップロード</div>
     <div class="upload-grid">
-      <div style="position:relative">
-        <label class="upload-area" id="upload-front" ondragover="onDragOver(event,'front')" ondragleave="onDragLeave('front')" ondrop="onDrop(event,'front')">
-          <input type="file" id="input-front" accept="image/*">
-          <div class="upload-placeholder" id="placeholder-front">
-            <div class="upload-icon">🖼</div>
-            <div class="upload-label">正面写真</div>
-            <div class="upload-sub">タップまたはドロップ</div>
-          </div>
-          <img class="preview-img" id="preview-front" alt="正面">
-        </label>
+      <div class="upload-box" id="upload-front" ondragover="onDragOver(event,'front')" ondragleave="onDragLeave('front')" ondrop="onDrop(event,'front')">
+        <div class="upload-icon" id="icon-front">🖼</div>
+        <div class="upload-label" id="label-front">正面写真</div>
+        <div class="upload-sub">ドロップ、または↓のボタンで選択</div>
+        <img class="preview-img" id="preview-front" alt="正面">
+        <input type="file" id="input-front" accept="image/*" style="display:none">
+        <button class="upload-btn" onclick="document.getElementById('input-front').click()">📂 写真を選ぶ</button>
         <button class="remove-btn" id="remove-front" onclick="removeImage(event,'front')">✕</button>
       </div>
-      <div style="position:relative">
-        <label class="upload-area" id="upload-side" ondragover="onDragOver(event,'side')" ondragleave="onDragLeave('side')" ondrop="onDrop(event,'side')">
-          <input type="file" id="input-side" accept="image/*">
-          <div class="upload-placeholder" id="placeholder-side">
-            <div class="upload-icon">🖼</div>
-            <div class="upload-label">横顔写真（任意）</div>
-            <div class="upload-sub">タップまたはドロップ</div>
-          </div>
-          <img class="preview-img" id="preview-side" alt="横顔">
-        </label>
+      <div class="upload-box" id="upload-side" ondragover="onDragOver(event,'side')" ondragleave="onDragLeave('side')" ondrop="onDrop(event,'side')">
+        <div class="upload-icon" id="icon-side">🖼</div>
+        <div class="upload-label" id="label-side">横顔写真（任意）</div>
+        <div class="upload-sub">ドロップ、または↓のボタンで選択</div>
+        <img class="preview-img" id="preview-side" alt="横顔">
+        <input type="file" id="input-side" accept="image/*" style="display:none">
+        <button class="upload-btn" onclick="document.getElementById('input-side').click()">📂 写真を選ぶ</button>
         <button class="remove-btn" id="remove-side" onclick="removeImage(event,'side')">✕</button>
       </div>
     </div>
@@ -255,34 +249,35 @@ function showApiStatus(ok,msg=''){
 function getApiKey(){return localStorage.getItem('pl_api_key')||'';}
 
 // 写真アップロード
-function onFileSelect(e,side){const f=e.target.files[0];if(f)loadImage(f,side);}
-// inputにaddEventListenerで確実に登録（DOMContentLoaded後）
-document.addEventListener('DOMContentLoaded',()=>{
-  document.getElementById('input-front').addEventListener('change',function(){
-    if(this.files[0])loadImage(this.files[0],'front');
-  });
-  document.getElementById('input-side').addEventListener('change',function(){
-    if(this.files[0])loadImage(this.files[0],'side');
-  });
-});
 function onDragOver(e,side){e.preventDefault();document.getElementById('upload-'+side).classList.add('dragover');}
 function onDragLeave(side){document.getElementById('upload-'+side).classList.remove('dragover');}
 function onDrop(e,side){e.preventDefault();document.getElementById('upload-'+side).classList.remove('dragover');const f=e.dataTransfer.files[0];if(f&&f.type.startsWith('image/'))loadImage(f,side);}
 function loadImage(file,side){
+  // FileReaderでbase64に変換（API送信用）
   const r=new FileReader();
-  r.onload=(e)=>{
-    const dataUrl=e.target.result;
-    if(side==='front')imgDataFront=dataUrl;
-    else imgDataSide=dataUrl;
-    document.getElementById('preview-'+side).src=dataUrl;
-    document.getElementById('preview-'+side).classList.add('visible');
-    document.getElementById('placeholder-'+side).classList.add('hidden');
-    document.getElementById('remove-'+side).classList.add('visible');
+  r.onload=function(){
+    if(side==='front')imgDataFront=r.result;
+    else imgDataSide=r.result;
+    // プレビュー表示
+    const prev=document.getElementById('preview-'+side);
+    prev.src=r.result;
+    prev.classList.add('visible');
+    document.getElementById('icon-'+side).style.display='none';
+    document.getElementById('label-'+side).style.display='none';
     document.getElementById('upload-'+side).classList.add('has-image');
+    document.getElementById('remove-'+side).classList.add('visible');
     checkReady();
   };
+  r.onerror=function(){alert('写真の読み込みに失敗しました。別の写真で試してください。');};
   r.readAsDataURL(file);
 }
+// inputのchangeイベントをJS側で登録
+document.getElementById('input-front').addEventListener('change',function(){
+  if(this.files&&this.files[0])loadImage(this.files[0],'front');
+});
+document.getElementById('input-side').addEventListener('change',function(){
+  if(this.files&&this.files[0])loadImage(this.files[0],'side');
+});
 function removeImage(e,side){
   e.preventDefault();
   e.stopPropagation();
