@@ -155,8 +155,8 @@ header span{font-size:11px;color:var(--accent2);letter-spacing:.1em;font-family:
   <div class="card">
     <div class="card-title">写真をアップロード</div>
     <div class="upload-grid">
-      <div class="upload-area" id="upload-front" onclick="document.getElementById('input-front').click()" ondragover="onDragOver(event,'front')" ondragleave="onDragLeave('front')" ondrop="onDrop(event,'front')">
-        <input type="file" id="input-front" accept="image/*" onchange="onFileSelect(event,'front')">
+      <label class="upload-area" id="upload-front" ondragover="onDragOver(event,'front')" ondragleave="onDragLeave('front')" ondrop="onDrop(event,'front')">
+        <input type="file" id="input-front" accept="image/*" style="display:none" onchange="onFileSelect(event,'front')">
         <div class="upload-placeholder" id="placeholder-front">
           <div class="upload-icon">🖼</div>
           <div class="upload-label">正面写真</div>
@@ -164,9 +164,9 @@ header span{font-size:11px;color:var(--accent2);letter-spacing:.1em;font-family:
         </div>
         <img class="preview-img" id="preview-front" alt="正面">
         <button class="remove-btn" id="remove-front" onclick="removeImage(event,'front')">✕</button>
-      </div>
-      <div class="upload-area" id="upload-side" onclick="document.getElementById('input-side').click()" ondragover="onDragOver(event,'side')" ondragleave="onDragLeave('side')" ondrop="onDrop(event,'side')">
-        <input type="file" id="input-side" accept="image/*" onchange="onFileSelect(event,'side')">
+      </label>
+      <label class="upload-area" id="upload-side" ondragover="onDragOver(event,'side')" ondragleave="onDragLeave('side')" ondrop="onDrop(event,'side')">
+        <input type="file" id="input-side" accept="image/*" style="display:none" onchange="onFileSelect(event,'side')">
         <div class="upload-placeholder" id="placeholder-side">
           <div class="upload-icon">🖼</div>
           <div class="upload-label">横顔写真（任意）</div>
@@ -174,7 +174,7 @@ header span{font-size:11px;color:var(--accent2);letter-spacing:.1em;font-family:
         </div>
         <img class="preview-img" id="preview-side" alt="横顔">
         <button class="remove-btn" id="remove-side" onclick="removeImage(event,'side')">✕</button>
-      </div>
+      </label>
     </div>
     <button class="analyze-btn" id="analyze-btn" onclick="analyze()" disabled>✦ AI で顔タイプを判定する</button>
     <div class="loading" id="loading"><span class="spinner"></span>Claude が写真を分析中です…（10〜20秒）</div>
@@ -271,6 +271,7 @@ function loadImage(file,side){
   r.readAsDataURL(file);
 }
 function removeImage(e,side){
+  e.preventDefault();
   e.stopPropagation();
   if(side==='front')imgDataFront=null;else imgDataSide=null;
   document.getElementById('preview-'+side).classList.remove('visible');
