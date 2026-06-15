@@ -157,7 +157,7 @@ header span{font-size:11px;color:var(--accent2);letter-spacing:.1em;font-family:
     <div class="upload-grid">
       <div style="position:relative">
         <label class="upload-area" id="upload-front" ondragover="onDragOver(event,'front')" ondragleave="onDragLeave('front')" ondrop="onDrop(event,'front')">
-          <input type="file" id="input-front" accept="image/*" onchange="onFileSelect(event,'front')">
+          <input type="file" id="input-front" accept="image/*">
           <div class="upload-placeholder" id="placeholder-front">
             <div class="upload-icon">🖼</div>
             <div class="upload-label">正面写真</div>
@@ -169,7 +169,7 @@ header span{font-size:11px;color:var(--accent2);letter-spacing:.1em;font-family:
       </div>
       <div style="position:relative">
         <label class="upload-area" id="upload-side" ondragover="onDragOver(event,'side')" ondragleave="onDragLeave('side')" ondrop="onDrop(event,'side')">
-          <input type="file" id="input-side" accept="image/*" onchange="onFileSelect(event,'side')">
+          <input type="file" id="input-side" accept="image/*">
           <div class="upload-placeholder" id="placeholder-side">
             <div class="upload-icon">🖼</div>
             <div class="upload-label">横顔写真（任意）</div>
@@ -256,6 +256,15 @@ function getApiKey(){return localStorage.getItem('pl_api_key')||'';}
 
 // 写真アップロード
 function onFileSelect(e,side){const f=e.target.files[0];if(f)loadImage(f,side);}
+// inputにaddEventListenerで確実に登録（DOMContentLoaded後）
+document.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('input-front').addEventListener('change',function(){
+    if(this.files[0])loadImage(this.files[0],'front');
+  });
+  document.getElementById('input-side').addEventListener('change',function(){
+    if(this.files[0])loadImage(this.files[0],'side');
+  });
+});
 function onDragOver(e,side){e.preventDefault();document.getElementById('upload-'+side).classList.add('dragover');}
 function onDragLeave(side){document.getElementById('upload-'+side).classList.remove('dragover');}
 function onDrop(e,side){e.preventDefault();document.getElementById('upload-'+side).classList.remove('dragover');const f=e.dataTransfer.files[0];if(f&&f.type.startsWith('image/'))loadImage(f,side);}
