@@ -167,7 +167,6 @@ h1{font-size:15px;font-weight:500;color:#666;letter-spacing:.05em;margin-bottom:
       <div class="sc" id="sm-su"><span class="sn">サマー</span><span class="sd">やわらかなブルベ</span></div>
     </div>
   </div>
-</div>
 
 <!-- お助け色カンペ -->
   <div class="card" id="kanpe-card" style="display:none">
@@ -238,6 +237,7 @@ h1{font-size:15px;font-weight:500;color:#666;letter-spacing:.05em;margin-bottom:
       <div class="note-item">🔄 <strong>色相比較ペア</strong>：オータム「バーミリオン」↔ ウィンター「アザレピンク」<br><span style="font-size:11px;color:#888">色相だけを比較する</span></div>
     </div>
   </div>
+</div>
 
 <!-- 判定結果 -->
 <div class="pnl" id="p-result">
@@ -262,6 +262,13 @@ h1{font-size:15px;font-weight:500;color:#666;letter-spacing:.05em;margin-bottom:
       <div class="rv" id="r-detail" style="font-size:12px;font-weight:400;line-height:1.6;text-align:right"></div>
     </div>
   </div>
+  <div id="proposal-area" style="display:none;margin-top:.75rem">
+    <div style="background:#f5f4f0;border-radius:10px;padding:1rem 1.25rem">
+      <div style="font-size:12px;font-weight:500;color:#888;margin-bottom:.5rem">提案文</div>
+      <div id="proposal-text" style="font-size:13px;color:#1a1a18;line-height:1.8;white-space:pre-wrap"></div>
+    </div>
+  </div>
+  <button onclick="genProposal()" style="width:100%;margin-top:.75rem;padding:12px;font-size:13px;font-weight:500;border-radius:10px;background:#1a1a18;color:#fff;border:none;cursor:pointer">✨ 提案文を生成</button>
 </div>
 </div>
 
@@ -625,6 +632,30 @@ function sw(name){
   if(name==='result')ur();
 }
 
+function genProposal(){
+  const sk=gsk(),face=document.getElementById('face-m').textContent,color=gseason();
+  if(sk.t==='—'||face==='—'){
+    alert('骨格・顔タイプ・カラーをすべて入力してから生成してください');return;
+  }
+  const axis=manualAxis||document.getElementById('ax-auto').textContent;
+  const skKey=sk.t+'_'+color,faKey=color+'_'+face,sfKey=sk.t+'_'+face;
+  const d1=ITF_SK_CO[skKey],d2=ITF_CO_FA_F[faKey],d3=ITF_SK_FA_F[sfKey];
+  const hint1=d1?d1[2]:'';
+  const hint2=d2?d2[2]:'';
+  const hint3=d3?d3[2]:'';
+  const text=`【診断結果サマリー】
+骨格：${sk.t}　カラー：${color}　顔タイプ：${face}
+魅力軸：${axis}
+
+【スタイリング提案】
+${hint1?'▶ 骨格×カラー：'+hint1:''}
+${hint3&&gender==='f'?'▶ 骨格×顔タイプ：'+hint3:''}
+${hint2&&gender==='f'?'▶ カラー×顔タイプ：'+hint2:''}
+
+あなたの魅力軸「${axis}」を主役に、得意な要素を組み合わせてスタイリングすると最も垢抜けた印象になります。`;
+  document.getElementById('proposal-text').textContent=text.trim();
+  document.getElementById('proposal-area').style.display='block';
+}
 function swKanpe(name){
   document.querySelectorAll('.kanpe-tab').forEach((t,i)=>{
     const names=['drape','yb','bb','note'];
