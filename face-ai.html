@@ -160,8 +160,8 @@ header span{font-size:11px;color:var(--accent2);letter-spacing:.1em;font-family:
         <div class="upload-label" id="label-front">正面写真</div>
         <div class="upload-sub">ドロップ、または↓のボタンで選択</div>
         <img class="preview-img" id="preview-front" alt="正面">
-        <input type="file" id="input-front" accept="image/*" style="position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;">
-        <label for="input-front" class="upload-btn">📂 写真を選ぶ</label>
+        <input type="file" id="input-front" accept="image/*" multiple style="position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;">
+        <label for="input-front" class="upload-btn">📂 写真を選ぶ（2枚同時OK）</label>
         <button class="remove-btn" id="remove-front" onclick="removeImage(event,'front')">✕</button>
       </div>
       <div class="upload-box" id="upload-side" ondragover="onDragOver(event,'side')" ondragleave="onDragLeave('side')" ondrop="onDrop(event,'side')">
@@ -272,7 +272,10 @@ function loadImage(file,side){
 }
 // inputのchangeイベントをJS側で登録
 document.getElementById('input-front').addEventListener('change',function(){
-  if(this.files&&this.files[0])loadImage(this.files[0],'front');
+  if(!this.files||!this.files[0])return;
+  loadImage(this.files[0],'front');
+  // 2枚同時選択された場合、2枚目を横顔に割り当て
+  if(this.files[1])loadImage(this.files[1],'side');
 });
 document.getElementById('input-side').addEventListener('change',function(){
   if(this.files&&this.files[0])loadImage(this.files[0],'side');

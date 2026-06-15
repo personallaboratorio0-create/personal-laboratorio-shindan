@@ -1,0 +1,17 @@
+#!/bin/bash
+cd "$(dirname "$0")"
+echo "====================================="
+echo "  診断ツール ローカルサーバー起動中"
+echo "====================================="
+echo ""
+echo "  ブラウザで以下を開いてください："
+echo ""
+echo "  顔タイプAI判定："
+echo "  http://localhost:8888/face-ai.html"
+echo ""
+echo "  3軸統合診断エンジン："
+echo "  http://localhost:8888/shindan-engine.html"
+echo ""
+echo "  終了するには このウィンドウを閉じてください"
+echo "====================================="
+python3 -m http.server 8888
