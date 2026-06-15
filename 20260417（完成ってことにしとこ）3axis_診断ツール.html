@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3軸統合診断エンジン｜Personal Laboratorio</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#f5f4f0;font-family:'Hiragino Kaku Gothic ProN','Hiragino Sans',sans-serif;color:#1a1a18;min-height:100vh;padding:1.5rem 1rem}
+h1{font-size:15px;font-weight:500;color:#666;letter-spacing:.05em;margin-bottom:1.5rem;text-align:center}
+.w{max-width:680px;margin:0 auto}
+.tabs{display:flex;border:.5px solid #ddd;border-radius:12px;overflow:hidden;margin-bottom:1.25rem;background:#fff}
+.tab{flex:1;padding:10px;font-size:13px;font-weight:500;background:#fff;border:none;cursor:pointer;color:#888;border-right:.5px solid #ddd}
+.tab:last-child{border-right:none}
+.tab.active{background:#f0f0ee;color:#1a1a18}
+.pnl{display:none}.pnl.active{display:block}
+.card{background:#fff;border:.5px solid #e0e0dc;border-radius:12px;padding:1.25rem;margin-bottom:1rem}
+.stitle{font-size:12px;font-weight:500;color:#888;margin-bottom:.75rem;letter-spacing:.04em}
+.cr{display:grid;grid-template-columns:minmax(0,1.6fr) 1fr 1fr 1fr;gap:6px;padding:6px 0;border-bottom:.5px solid #eee;align-items:center}
+.cr:last-child{border-bottom:none}
+.cr.hd{font-size:11px;color:#aaa;font-weight:500}
+.cr2{display:grid;grid-template-columns:minmax(0,1.6fr) 1fr 1fr 1fr;gap:6px;padding:6px 0;border-bottom:.5px solid #eee;align-items:center}
+.opt{display:flex;justify-content:center}
+.opt label{font-size:11px;color:#666;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;text-align:center;line-height:1.3}
+.opt input[type=radio]{accent-color:#3a7bd5}
+.sbar{display:flex;gap:8px;margin-top:.75rem;padding-top:.75rem;border-top:.5px solid #eee}
+.chip{flex:1;background:#f5f4f0;border-radius:8px;padding:8px;text-align:center}
+.chip .cl{font-size:11px;color:#888}
+.chip .cv{font-size:17px;font-weight:500;color:#1a1a18}
+.chip.on{background:#e8f0fc}
+.chip.on .cl,.chip.on .cv{color:#2a5cc8}
+.gtoggle{display:flex;gap:6px;margin-bottom:1rem}
+.gbtn{flex:1;padding:8px;font-size:13px;font-weight:500;border-radius:8px;background:#fff;border:.5px solid #ccc;color:#888;cursor:pointer;transition:all .15s}
+.gbtn.active{background:#e8f0fc;color:#2a5cc8;border-color:transparent}
+.mc{border:.5px solid #ddd;border-radius:8px;padding:6px 4px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:44px;transition:all .15s}
+.mc.on{border:2px solid #3a7bd5;background:#e8f0fc}
+.mc.empty{border-color:transparent;background:transparent}
+.mc .mn{font-size:11px;font-weight:500;color:#1a1a18;text-align:center;line-height:1.3}
+.mc.on .mn{color:#1a4a9e}
+.mh{font-size:11px;color:#aaa;display:flex;align-items:center;justify-content:center;font-weight:500;text-align:center;line-height:1.3}
+.skr{display:grid;grid-template-columns:minmax(0,1.6fr) 1fr 1fr 1fr 1fr;gap:6px;padding:5px 0;border-bottom:.5px solid #eee;align-items:center;font-size:12px}
+.skr.hd{font-size:11px;color:#aaa;font-weight:500}
+.alr{display:flex;justify-content:space-between;font-size:11px;color:#aaa;padding:0 36px;margin-bottom:4px}
+.sr{display:flex;align-items:center;gap:10px;margin-bottom:1rem}
+.sl{font-size:12px;color:#666;min-width:54px;text-align:center}
+.sr input[type=range]{flex:1;accent-color:#3a7bd5}
+.sg{display:grid;grid-template-columns:36px 1fr 1fr;grid-template-rows:22px 1fr 1fr;gap:5px;margin-top:.75rem}
+.sc{border:.5px solid #ddd;border-radius:8px;padding:10px 8px;text-align:center;transition:all .15s}
+.sc.on{border:2px solid #3a7bd5;background:#e8f0fc}
+.sc .sn{font-size:13px;font-weight:500;color:#1a1a18;display:block;margin-bottom:2px}
+.sc.on .sn{color:#1a4a9e}
+.sc .sd{font-size:10px;color:#888;line-height:1.4}
+.sc.on .sd{color:#2a5cc8}
+.ra{background:#f5f4f0;border-radius:10px;padding:1rem 1.25rem;margin-bottom:1rem}
+.rr{display:flex;justify-content:space-between;align-items:flex-start;padding:7px 0;font-size:14px;border-bottom:.5px solid #e0e0dc}
+.rr:last-child{border-bottom:none}
+.rl{color:#888;min-width:80px;padding-top:2px;font-size:13px}
+.rv{font-weight:500;color:#1a1a18;text-align:right;flex:1}
+.bdg{display:inline-block;font-size:11px;font-weight:500;padding:2px 8px;border-radius:99px;margin-left:4px}
+.bi{background:#e8f0fc;color:#2a5cc8}
+.bd{background:#fde8e8;color:#c82a2a}
+.bw{background:#fef3cd;color:#a07800}
+.bs{background:#e8fce8;color:#2a8c2a}
+.axbtns{display:flex;gap:6px;flex-wrap:wrap}
+.axbtn{padding:6px 12px;font-size:12px;font-weight:500;border-radius:8px;background:#fff;border:.5px solid #ccc;color:#888;cursor:pointer;transition:all .15s}
+.axbtn.active{background:#e8f0fc;color:#2a5cc8;border-color:transparent}
+.hint{font-size:11px;color:#aaa;margin-top:4px}
+.itf-detail{font-size:11px;color:#666;margin-top:4px;line-height:1.6}
+</style>
+</head>
+<body>
+<div class="w">
+<h1>3軸統合診断エンジン｜Personal Laboratorio</h1>
+
+<div class="tabs">
+  <button class="tab active" onclick="sw('face')">顔タイプ</button>
+  <button class="tab" onclick="sw('skel')">骨格</button>
+  <button class="tab" onclick="sw('color')">カラー</button>
+  <button class="tab" onclick="sw('result')">判定結果</button>
+</div>
+
+<!-- 顔タイプ -->
+<div class="pnl active" id="p-face">
+  <div class="gtoggle">
+    <button class="gbtn active" id="gb-f" onclick="setGender('f')">女性</button>
+    <button class="gbtn" id="gb-m" onclick="setGender('m')">男性</button>
+  </div>
+  <div class="card">
+    <div class="stitle">顔タイプ判定マトリクス</div>
+    <div id="matrix-wrap"></div>
+    <div class="sbar" style="margin-top:.5rem">
+      <div class="chip" style="text-align:center;flex:2">
+        <div class="cl">判定結果</div>
+        <div class="cv" id="face-m" style="font-size:15px">—</div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="stitle">軸1：世代感（子供顔 ↔ 大人顔）</div>
+    <div class="cr hd"><div>項目</div><div style="text-align:center">子供顔</div><div style="text-align:center">同じ</div><div style="text-align:center">大人顔</div></div>
+    <div id="age-c"></div>
+    <div class="sbar" id="age-b"></div>
+  </div>
+  <div class="card">
+    <div class="stitle">軸2：形状（曲線 ↔ 直線）</div>
+    <div class="cr2 hd"><div>項目</div><div style="text-align:center">曲線</div><div style="text-align:center">普通</div><div style="text-align:center">直線</div></div>
+    <div id="cur-c"></div>
+    <div class="sbar" id="cur-b"></div>
+  </div>
+</div>
+
+<!-- 骨格 -->
+<div class="pnl" id="p-skel">
+  <div class="card">
+    <div class="stitle">骨格診断（17項目）</div>
+    <div class="skr hd"><div>部位</div><div style="text-align:center">S</div><div style="text-align:center">W</div><div style="text-align:center">N</div><div style="text-align:center">未</div></div>
+    <div id="sk-c"></div>
+    <div class="sbar" id="sk-b"></div>
+  </div>
+</div>
+
+<!-- カラー -->
+<div class="pnl" id="p-color">
+  <div class="card">
+    <div class="stitle">パーソナルカラー入力</div>
+    <div class="alr"><span>イエベ</span><span>ブルベ</span></div>
+    <div class="sr"><span class="sl" id="vyb">50%</span><input type="range" id="yb" min="0" max="100" value="50" oninput="uc()"></div>
+    <div class="alr"><span>明</span><span>暗</span></div>
+    <div class="sr"><span class="sl" id="vbr">50%</span><input type="range" id="br" min="0" max="100" value="50" oninput="uc()"></div>
+    <div class="alr"><span>澄んだ</span><span>くすみ</span></div>
+    <div class="sr"><span class="sl" id="vcl">50%</span><input type="range" id="cl" min="0" max="100" value="50" oninput="uc()"></div>
+  </div>
+  <div class="card">
+    <div class="stitle">4シーズン判定</div>
+    <div class="sg">
+      <div></div><div class="mh">澄んだ</div><div class="mh">くすみ</div>
+      <div class="mh" style="writing-mode:vertical-rl">イエベ</div>
+      <div class="sc" id="sm-sp"><span class="sn">スプリング</span><span class="sd">明るく澄んだイエベ</span></div>
+      <div class="sc" id="sm-au"><span class="sn">オータム</span><span class="sd">深みのあるイエベ</span></div>
+      <div class="mh" style="writing-mode:vertical-rl">ブルベ</div>
+      <div class="sc" id="sm-wi"><span class="sn">ウィンター</span><span class="sd">クリアなブルベ</span></div>
+      <div class="sc" id="sm-su"><span class="sn">サマー</span><span class="sd">やわらかなブルベ</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- 判定結果 -->
+<div class="pnl" id="p-result">
+  <div class="ra">
+    <div class="rr"><span class="rl">骨格</span><span class="rv" id="r-sk">—</span></div>
+    <div class="rr"><span class="rl">カラー</span><span class="rv" id="r-co">—</span></div>
+    <div class="rr"><span class="rl">顔タイプ</span><span class="rv" id="r-fa">—</span></div>
+    <div class="rr">
+      <span class="rl">魅力軸</span>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+        <div class="axbtns">
+          <button class="axbtn" onclick="setAxis('顔タイプ')">顔タイプ</button>
+          <button class="axbtn" onclick="setAxis('骨格')">骨格</button>
+          <button class="axbtn" onclick="setAxis('カラー')">カラー</button>
+        </div>
+        <div class="hint">自動参考：<span id="ax-auto">—</span></div>
+      </div>
+    </div>
+    <div class="rr"><span class="rl">干渉レベル</span><span class="rv" id="r-in">—</span></div>
+    <div class="rr" id="rr-detail" style="display:none">
+      <span class="rl">干渉詳細</span>
+      <div class="rv" id="r-detail" style="font-size:12px;font-weight:400;line-height:1.6;text-align:right"></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<script>
+let gender='f';
+let manualAxis=null;
+
+const ITF_SK_CO={
+  'ストレート_スプリング':[1,'メリハリ×ハリ感で相性◎','ベーシックにメリハリ展開'],
+  'ストレート_サマー':[2,'骨格はハリ素材／カラーは柔らか素材','高級素材でサマーカラーを展開。コントラスト強めかシックに'],
+  'ストレート_オータム':[2,'骨格のシンプルさ vs カラーの艶やかさ','深みカラーをシンプルシルエットで着る'],
+  'ストレート_ウィンター':[1,'コントラスト×シャープで相性◎','モノトーン強コントラストで最強'],
+  'ウェーブ_スプリング':[2,'ビタミン色のポップさが強く出やすい','オーガンジーや透け素材など軽やかな素材感で抜け感を作る'],
+  'ウェーブ_サマー':[0,'柔らか素材×淡い色で完全一致','最強の組み合わせ'],
+  'ウェーブ_オータム':[2,'ウェーブの軽やかさ vs オータムの深み重さ','素材は軽く保ち色だけ深みを取り入れる'],
+  'ウェーブ_ウィンター':[2,'ウェーブのコンパクト感 vs ウィンターの強さ','小さいアイテムで強コントラストを入れる'],
+  'ナチュラル_スプリング':[2,'ナチュラルのラフ素材 vs スプリングの明るい色','リネン素材をコーラル・テラコッタで着こなす'],
+  'ナチュラル_サマー':[2,'ナチュラルのこなれ感 vs サマーの清楚エレガント','ナチュラルカラーのサマーをざっくり素材で着こなす'],
+  'ナチュラル_オータム':[1,'ラフ×深みこなれ感で相性◎','最強の組み合わせ。アースカラーで垢抜ける'],
+  'ナチュラル_ウィンター':[2,'ナチュラルのラフ感 vs ウィンターのシャープ強い色','ざっくり素材でモノトーンを着こなすと都会的'],
+};
+const ITF_SK_FA_F={
+  'ストレート_キュート':[3,'顔はフリル・丸襟が欲しい／骨格はシンプルが得意','首元だけフリル・丸襟をポイントにボディはシンプルに'],
+  'ストレート_アクティブキュート':[1,'ポップ×ハリ感でスポーティに展開できる','スポーティきれいめで展開'],
+  'ストレート_フレッシュ':[0,'両方ともシンプル・直線系で相性◎','シンプルきれいめで最強'],
+  'ストレート_クールカジュアル':[1,'直線同士で相性◎','ボーイッシュきれいめで展開'],
+  'ストレート_フェミニン':[3,'顔は花柄・レース・ドレープ／骨格はシンプル・ハリ','ドレープ素材のシンプルシルエットで女性らしさを'],
+  'ストレート_ソフトエレガント':[1,'上品×シンプルで相性◎','王道きれいめで展開'],
+  'ストレート_エレガント':[0,'洗練×Iラインで最強','Iライン×洗練で最強'],
+  'ストレート_クール':[0,'直線×シンプルで完全一致','モード・都会的で最強'],
+  'ウェーブ_キュート':[0,'曲線×柔らか素材で完全一致','甘め全開で最強'],
+  'ウェーブ_アクティブキュート':[1,'柔らか×ポップで相性◎','カラフルコンパクトで展開'],
+  'ウェーブ_フレッシュ':[2,'顔はシンプル直線／骨格はXライン・装飾が欲しい','シンプルトップス×フレアスカートでYライン'],
+  'ウェーブ_クールカジュアル':[2,'顔はボーイッシュ直線／骨格は柔らか曲線素材','柔らか素材をマニッシュなシルエットで着る'],
+  'ウェーブ_フェミニン':[0,'曲線×柔らか×女性らしさで最強','女性らしさ全開で最強'],
+  'ウェーブ_ソフトエレガント':[1,'上品×コンパクトで相性◎','上品フェミニンで展開'],
+  'ウェーブ_エレガント':[2,'顔は洗練・モード／骨格は柔らか素材','柔らかシフォン・サテンで洗練を表現'],
+  'ウェーブ_クール':[2,'顔はシャープ直線／骨格は柔らか曲線','タイトシルエットを柔らか素材で着こなす'],
+  'ナチュラル_キュート':[3,'顔は小さく甘いデザイン／骨格はゆったり大きめ','Aラインなど程よいボリュームで甘さを出す'],
+  'ナチュラル_アクティブキュート':[1,'ポップ×こなれ感で相性◎','パーカー・スウェット・民族系の鮮やかカラーで元気さを表現'],
+  'ナチュラル_フレッシュ':[2,'顔は清潔感・シンプル／骨格はラフ素材','リネンシャツなど清潔感あるラフ素材で爽やかに'],
+  'ナチュラル_クールカジュアル':[0,'直線×ゆったりこなれ感で最強','ゆったりボーイッシュで最強'],
+  'ナチュラル_フェミニン':[3,'顔はレース・花柄・柔らか／骨格はラフ素材','丸みのあるデザイン（丸襟・バルーン袖）で女性らしさを残す'],
+  'ナチュラル_ソフトエレガント':[2,'顔は上品／骨格はラフ素材','リネンやスエードを上品なシルエットで着こなす'],
+  'ナチュラル_エレガント':[2,'顔は洗練・モード／骨格はラフこなれ感','大柄をモードなシルエットで着こなす'],
+  'ナチュラル_クール':[1,'直線×こなれ感で相性◎','モードなゆったりシルエットで都会的に'],
+};
+const ITF_CO_FA_F={
+  'スプリング_キュート':[0,'明るくキュート×可愛らしい印象で完全一致','カラフル全開で最強'],
+  'スプリング_アクティブキュート':[0,'ポップ×明るいカラーでインパクト一致','ビタミンカラーではっきり元気よく最強'],
+  'スプリング_フレッシュ':[1,'爽やか×クリアカラーで相性◎','クリアカラーで清潔感よく展開'],
+  'スプリング_クールカジュアル':[2,'顔はシャープ直線／カラーは明るくキュート','シンプルなカラーリングで顔のシャープさを活かす'],
+  'スプリング_フェミニン':[1,'華やか×明るい暖色で相性◎','コーラルピンクで華やかフェミニンに'],
+  'スプリング_ソフトエレガント':[2,'顔は上品コンサバ／カラーは明るくカラフル','淡いイエベカラーで派手になりすぎず上品に'],
+  'スプリング_エレガント':[1,'華やか×明るい暖色で相性◎','キャメル・ベージュベースに暖色アクセントで洗練'],
+  'スプリング_クール':[2,'顔はシャープ都会的／カラーは明るくポップ','アイボリー・ライトベージュなど明るめのニュートラルで都会的に'],
+  'サマー_キュート':[2,'顔は可愛く明るめ／カラーは淡く上品','ベビーピンク・ラベンダーなど淡い曲線柄で可愛らしく'],
+  'サマー_アクティブキュート':[2,'顔はインパクト強め／カラーは淡く柔らか','淡い色でもはっきりした柄やデザインでインパクトを出す'],
+  'サマー_フレッシュ':[1,'爽やか×淡いブルベカラーで相性◎','ミントグリーン・パウダーブルーで爽やかに展開'],
+  'サマー_クールカジュアル':[1,'シャープ直線×ネイビー・グレーで相性◎','ネイビー・グレーでボーイッシュきれいめに'],
+  'サマー_フェミニン':[0,'華やか曲線×エレガントカラーで最強','ローズピンク・ラベンダーで華やかフェミニンに最強'],
+  'サマー_ソフトエレガント':[0,'上品コンサバ×淡い柔らかカラーで最強','淡いローズ・ベビーピンクで上品に最強'],
+  'サマー_エレガント':[1,'華やか×エレガントカラーで相性◎','ローズピンク・ラベンダーで洗練を表現'],
+  'サマー_クール':[1,'シャープ×ニュートラルカラーで相性◎','ネイビー・グレー・ココアブラウンで都会的に'],
+  'オータム_キュート':[2,'顔は可愛く軽め／カラーは深く重め','キャメル・テラコッタなど明るめオータムカラーで甘さを残す'],
+  'オータム_アクティブキュート':[1,'元気×深みカラーで相性◎','マスタード・ベージュで元気よく展開'],
+  'オータム_フレッシュ':[2,'顔は爽やか軽め／カラーは深く重め','オリーブ・カーキなど落ち着いたアースカラーで爽やかに'],
+  'オータム_クールカジュアル':[1,'ボーイッシュ×アースカラーで相性◎','カーキ・ブラウンでボーイッシュこなれ感に'],
+  'オータム_フェミニン':[1,'華やか曲線×艶やかカラーで相性◎','サーモンピンク・テラコッタで大人フェミニンに柔らかく'],
+  'オータム_ソフトエレガント':[1,'上品×深みカラーで相性◎','モスグリーン・ブラウンで上品に展開'],
+  'オータム_エレガント':[0,'華やか×ゴージャスカラーで最強','ターコイズ・ピーコックブルー・コッパーオレンジで洗練ゴージャスに最強'],
+  'オータム_クール':[1,'シャープ×深みアースカラーで相性◎','ブラウン・カーキ・オリーブで都会的に'],
+  'ウィンター_キュート':[1,'ウィンターの強さが可愛らしい顔に映える','アイシーピンク・レッドなどウィンターカラーで可愛らしくインパクトを出す'],
+  'ウィンター_アクティブキュート':[1,'インパクト×ビビッドカラーで相性◎','フューシャ・ビビッドピンクで元気よく最強'],
+  'ウィンター_フレッシュ':[2,'顔は爽やか軽め／カラーは強くシャープ','アイシーブルー・ホワイトで清潔感シャープに'],
+  'ウィンター_クールカジュアル':[0,'シャープ直線×モノトーンで最強','モノトーン・ネイビーでボーイッシュ最強'],
+  'ウィンター_フェミニン':[2,'顔は柔らか曲線／カラーは強くシャープ','バーガンディ・ディープローズで大人フェミニンに'],
+  'ウィンター_ソフトエレガント':[2,'顔は上品コンサバ／カラーは強くシャープ','アイシーカラーやグレーで服に負けないよう上品に'],
+  'ウィンター_エレガント':[0,'華やか×シャープ強いカラーで最強','バーガンディ・フューシャで洗練ゴージャスに最強'],
+  'ウィンター_クール':[0,'シャープ都会的×モノトーン・ビビッドで最強','モノトーン・ネイビー・バーガンディで都会的に最強'],
+};
+
+function itfLevel(n){return n===0?'なし':n===1?'なし〜弱':n===2?'弱':'強';}
+function itfBadge(n){
+  const l=itfLevel(n);
+  const c=n===3?'bd':n===2?'bw':n===1?'bi':'bs';
+  return`<span class="bdg ${c}">${l}</span>`;
+}
+
+const AI=[
+  {n:'顔の縦横バランス（横×1.4より）',c:'縦が短い',s:'同じ',a:'縦が長い'},
+  {n:'目の大きさ',c:'大きい',s:'普通',a:'小さい'},
+  {n:'パーツ比率①おでこ',c:'②③が短い',s:'①②③同じ',a:'②③が長い'},
+  {n:'パーツ比率③あご先',c:'③が短い',s:'②が長い',a:'③が長い'},
+  {n:'目の比率',c:'目幅が広い',s:'同じ',a:'目幅が狭い'},
+  {n:'鼻根の高さ',c:'低い',s:'なだらか',a:'高い'},
+  {n:'顔の立体感',c:'扁平',s:'標準',a:'中高'},
+  {n:'目の角度',c:'たれ目',s:'水平',a:'つり目'},
+  {n:'口の大きさ',c:'小さい',s:'普通',a:'大きい'},
+];
+const CI=[
+  {n:'顔全体',c:'骨を感じない',s:'',l:'骨を感じる',p:1,two:false},
+  {n:'おでこ',c:'丸みあり',s:'',l:'丸みなし',p:1,two:false},
+  {n:'フェイスライン',c:'骨なし',s:'',l:'骨あり',p:1,two:false},
+  {n:'頬',c:'丸みあり',s:'',l:'丸みなし',p:1,two:false},
+  {n:'鼻筋',c:'肉感あり',s:'どちらでもない',l:'骨・線あり',p:1,two:false},
+  {n:'目・形（丸み/縦幅）各2点',c:'丸い・縦幅あり',s:'普通',l:'細い・一重等',p:2,two:true},
+  {n:'目・印象（優しめ/強め）各2点',c:'優しめ',s:'普通',l:'強め',p:2,two:true},
+  {n:'眉',c:'曲線・薄い',s:'普通',l:'直線・濃い',p:1,two:false},
+  {n:'唇',c:'厚い',s:'普通',l:'薄い',p:1,two:false},
+];
+const SK=['重心','首','鎖骨','手首（骨の形）','手（厚み・大きさ）','爪','二の腕','腰の張り（ライン）','膝','靴のサイズ感','胸の厚み','バストライン','肩甲骨','背中','腰位置','横から見た時の厚み・体のライン','頭の形'];
+const F_TYPES={
+  curve:['キュート','アクティブキュート','フェミニン'],
+  mid:['フレッシュ','ソフトエレガント','エレガント'],
+  line:['クールカジュアル','クール']
+};
+
+function getFaceType(cp,ap,cv,lp){
+  const total=cp+ap;if(total===0)return{type:'—',key:null};
+  const curveTotal=cv+lp;
+  const curveRatio=curveTotal>0?cv/curveTotal:0.5;
+  const lineRatio=1-curveRatio;
+  const isAdult=ap>cp;
+  const ageStrong=total>0?Math.abs(ap-cp)/total:0;
+  let col;
+  if(curveRatio>=0.6)col='curve';
+  else if(lineRatio>=0.6)col='line';
+  else col='mid';
+  let row;
+  if(col==='curve'){row=!isAdult?(ageStrong>=0.4?0:1):2;}
+  else if(col==='mid'){row=!isAdult?0:(ageStrong>=0.4?1:2);}
+  else{row=isAdult?1:0;}
+  const types=F_TYPES[col];
+  return{type:types[Math.min(row,types.length-1)],key:col+'_'+row};
+}
+
+function buildMatrix(){
+  const wrap=document.getElementById('matrix-wrap');wrap.innerHTML='';
+  if(gender==='f'){
+    const g=document.createElement('div');
+    g.style.cssText='display:grid;grid-template-columns:28px 1fr 1fr 1fr;gap:4px;margin-bottom:.5rem';
+    g.innerHTML=`<div></div><div class="mh" style="font-size:10px">曲線</div><div class="mh" style="font-size:10px">中間</div><div class="mh" style="font-size:10px">直線</div>
+    <div class="mh" style="writing-mode:vertical-rl;font-size:9px;grid-row:span 2">子供顔</div>
+    <div class="mc" id="mc-curve_0"><span class="mn">キュート</span></div>
+    <div class="mc" id="mc-mid_0"><span class="mn">フレッシュ</span></div>
+    <div class="mc" id="mc-line_0"><span class="mn">クールカジュアル</span></div>
+    <div class="mc" id="mc-curve_1"><span class="mn">アクティブ<br>キュート</span></div>
+    <div class="mc empty"></div><div class="mc empty"></div>
+    <div class="mh" style="writing-mode:vertical-rl;font-size:9px;grid-row:span 2">大人顔</div>
+    <div class="mc" id="mc-curve_2"><span class="mn">フェミニン</span></div>
+    <div class="mc" id="mc-mid_1"><span class="mn">ソフト<br>エレガント</span></div>
+    <div class="mc" id="mc-line_1"><span class="mn">クール</span></div>
+    <div class="mc empty"></div>
+    <div class="mc" id="mc-mid_2"><span class="mn">エレガント</span></div>
+    <div class="mc empty"></div>`;
+    wrap.appendChild(g);
+  } else {
+    const g=document.createElement('div');
+    g.style.cssText='display:grid;grid-template-columns:32px 1fr 1fr 1fr 1fr;grid-template-rows:22px 1fr 1fr;gap:5px;margin-bottom:.5rem';
+    g.innerHTML=`<div></div><div class="mh" style="font-size:10px">直線ハード</div><div class="mh" style="font-size:10px">直線ソフト</div><div class="mh" style="font-size:10px">曲線ハード</div><div class="mh" style="font-size:10px">曲線ソフト</div>
+    <div class="mh" style="writing-mode:vertical-rl">子供顔</div>
+    <div class="mc" id="mc-flh"><span class="mn" style="font-size:11px">フレッシュ<br>ハード</span></div>
+    <div class="mc" id="mc-fls"><span class="mn" style="font-size:11px">フレッシュ<br>ソフト</span></div>
+    <div class="mc" id="mc-chh"><span class="mn" style="font-size:11px">チャーミング<br>ハード</span></div>
+    <div class="mc" id="mc-chs"><span class="mn" style="font-size:11px">チャーミング<br>ソフト</span></div>
+    <div class="mh" style="writing-mode:vertical-rl">大人顔</div>
+    <div class="mc" id="mc-clh"><span class="mn" style="font-size:11px">クール<br>ハード</span></div>
+    <div class="mc" id="mc-cls"><span class="mn" style="font-size:11px">クール<br>ソフト</span></div>
+    <div class="mc" id="mc-elh"><span class="mn" style="font-size:11px">エレガント<br>ハード</span></div>
+    <div class="mc" id="mc-els"><span class="mn" style="font-size:11px">エレガント<br>ソフト</span></div>`;
+    wrap.appendChild(g);
+  }
+  cf();
+}
+
+function setGender(g){gender=g;document.getElementById('gb-f').classList.toggle('active',g==='f');document.getElementById('gb-m').classList.toggle('active',g==='m');buildMatrix();}
+function setAxis(ax){manualAxis=ax;document.querySelectorAll('.axbtn').forEach(b=>b.classList.toggle('active',b.textContent===ax));ur();}
+
+function bAge(){
+  const c=document.getElementById('age-c');
+  AI.forEach((it,i)=>{
+    const d=document.createElement('div');d.className='cr';
+    d.innerHTML=`<div style="font-size:12px;color:#333">${it.n}</div>
+    <div class="opt"><label><input type="radio" name="a${i}" value="0" onchange="cf()"><span>${it.c}</span></label></div>
+    <div class="opt"><label><input type="radio" name="a${i}" value="1" onchange="cf()"><span>${it.s}</span></label></div>
+    <div class="opt"><label><input type="radio" name="a${i}" value="2" onchange="cf()"><span>${it.a}</span></label></div>`;
+    c.appendChild(d);
+  });
+}
+
+function bCur(){
+  const c=document.getElementById('cur-c');
+  CI.forEach((it,i)=>{
+    const d=document.createElement('div');
+    if(it.two){
+      d.className='cr2';
+      d.innerHTML=`<div style="font-size:12px;color:#333">${it.n}<br><span style="font-size:10px;color:#aaa">左目 / 右目</span></div>
+      <div style="display:flex;flex-direction:column;gap:3px;align-items:center">
+        <label style="font-size:11px;color:#666;display:flex;flex-direction:column;align-items:center;gap:2px"><input type="radio" name="c${i}L" value="0" onchange="cf()"><span>${it.c}</span></label>
+        <label style="font-size:11px;color:#666;display:flex;flex-direction:column;align-items:center;gap:2px"><input type="radio" name="c${i}R" value="0" onchange="cf()"><span>${it.c}</span></label>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:3px;align-items:center">
+        <label style="font-size:11px;color:#666;display:flex;flex-direction:column;align-items:center;gap:2px"><input type="radio" name="c${i}L" value="1" onchange="cf()"><span>普通</span></label>
+        <label style="font-size:11px;color:#666;display:flex;flex-direction:column;align-items:center;gap:2px"><input type="radio" name="c${i}R" value="1" onchange="cf()"><span>普通</span></label>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:3px;align-items:center">
+        <label style="font-size:11px;color:#666;display:flex;flex-direction:column;align-items:center;gap:2px"><input type="radio" name="c${i}L" value="2" onchange="cf()"><span>${it.l}</span></label>
+        <label style="font-size:11px;color:#666;display:flex;flex-direction:column;align-items:center;gap:2px"><input type="radio" name="c${i}R" value="2" onchange="cf()"><span>${it.l}</span></label>
+      </div>`;
+    } else {
+      d.className='cr';
+      const hs=it.s!=='';
+      d.innerHTML=`<div style="font-size:12px;color:#333">${it.n}</div>
+      <div class="opt"><label><input type="radio" name="c${i}" value="0" onchange="cf()"><span>${it.c}</span></label></div>
+      <div class="opt"><label><input type="radio" name="c${i}" value="1" ${!hs?'style="visibility:hidden"':''} onchange="cf()"><span>${it.s}</span></label></div>
+      <div class="opt"><label><input type="radio" name="c${i}" value="2" onchange="cf()"><span>${it.l}</span></label></div>`;
+    }
+    c.appendChild(d);
+  });
+}
+
+function bSk(){
+  const c=document.getElementById('sk-c');
+  SK.forEach((_,i)=>{
+    const d=document.createElement('div');d.className='skr';
+    d.innerHTML=`<div>${SK[i]}</div>
+    <div style="text-align:center"><input type="radio" name="sk${i}" value="S" onchange="cs()"></div>
+    <div style="text-align:center"><input type="radio" name="sk${i}" value="W" onchange="cs()"></div>
+    <div style="text-align:center"><input type="radio" name="sk${i}" value="N" onchange="cs()"></div>
+    <div style="text-align:center"><input type="radio" name="sk${i}" value="-" checked onchange="cs()"></div>`;
+    c.appendChild(d);
+  });
+}
+
+function rv(n){const e=document.querySelector(`input[name="${n}"]:checked`);return e?e.value:null;}
+function rsb(id,ls,vs){
+  const b=document.getElementById(id);if(!b)return;
+  const mx=Math.max(...vs);
+  b.innerHTML=ls.map((l,i)=>`<div class="chip ${vs[i]===mx&&vs[i]>0?'on':''}"><div class="cl">${l}</div><div class="cv">${vs[i]}</div></div>`).join('');
+}
+
+function cf(){
+  let cp=0,ap=0,cv=0,lp=0;
+  AI.forEach((_,i)=>{const v=rv('a'+i);if(v==='0')cp++;else if(v==='2')ap++;});
+  CI.forEach((it,i)=>{
+    if(it.two){
+      const vL=rv('c'+i+'L'),vR=rv('c'+i+'R');
+      if(vL==='0')cv+=it.p;else if(vL==='2')lp+=it.p;
+      if(vR==='0')cv+=it.p;else if(vR==='2')lp+=it.p;
+    } else {
+      const v=rv('c'+i);if(v==='0')cv+=it.p;else if(v==='2')lp+=it.p;
+    }
+  });
+  rsb('age-b',['子供顔','標準','大人顔'],[cp,0,ap]);
+  rsb('cur-b',['曲線','標準','直線'],[cv,0,lp]);
+  document.querySelectorAll('.mc').forEach(el=>el.classList.remove('on'));
+  let ft='—';
+  if(gender==='f'){
+    const res=getFaceType(cp,ap,cv,lp);ft=res.type;
+    if(res.key){const el=document.getElementById('mc-'+res.key);if(el)el.classList.add('on');}
+  } else {
+    const isA=ap>cp,isC=cv>lp;
+    if(cp>0||ap>0){
+      if(isA&&isC){ft='エレガント';document.getElementById('mc-els')?.classList.add('on');document.getElementById('mc-elh')?.classList.add('on');}
+      else if(isA&&!isC){ft='クール';document.getElementById('mc-cls')?.classList.add('on');document.getElementById('mc-clh')?.classList.add('on');}
+      else if(!isA&&isC){ft='チャーミング';document.getElementById('mc-chs')?.classList.add('on');document.getElementById('mc-chh')?.classList.add('on');}
+      else{ft='フレッシュ';document.getElementById('mc-fls')?.classList.add('on');document.getElementById('mc-flh')?.classList.add('on');}
+    }
+  }
+  document.getElementById('face-m').textContent=ft;
+  ur();
+}
+
+function cs(){
+  let s=0,w=0,n=0;
+  SK.forEach((_,i)=>{const v=rv('sk'+i);if(v==='S')s++;else if(v==='W')w++;else if(v==='N')n++;});
+  rsb('sk-b',['ストレート','ウェーブ','ナチュラル'],[s,w,n]);
+  ur();
+}
+
+function gsk(){
+  let s=0,w=0,n=0;
+  SK.forEach((_,i)=>{const v=rv('sk'+i);if(v==='S')s++;else if(v==='W')w++;else if(v==='N')n++;});
+  const mx=Math.max(s,w,n);
+  if(mx===0)return{t:'—',sc:0,s,w,n};
+  return{t:s===mx?'ストレート':w===mx?'ウェーブ':'ナチュラル',sc:mx,s,w,n};
+}
+
+function gseason(){
+  const yb=parseInt(document.getElementById('yb').value);
+  const cl=parseInt(document.getElementById('cl').value);
+  if(yb<50&&cl<50)return'スプリング';
+  if(yb<50&&cl>=50)return'オータム';
+  if(yb>=50&&cl<50)return'ウィンター';
+  return'サマー';
+}
+
+function uc(){
+  document.getElementById('vyb').textContent=document.getElementById('yb').value+'%';
+  document.getElementById('vbr').textContent=document.getElementById('br').value+'%';
+  document.getElementById('vcl').textContent=document.getElementById('cl').value+'%';
+  const k=gseason();
+  const map={スプリング:'sm-sp',オータム:'sm-au',ウィンター:'sm-wi',サマー:'sm-su'};
+  ['sm-sp','sm-su','sm-au','sm-wi'].forEach(id=>document.getElementById(id).classList.remove('on'));
+  document.getElementById(map[k]).classList.add('on');
+  ur();
+}
+
+function calcInterference(axis,sk,color,face){
+  if(sk==='—'||color==='—'||face==='—')return{level:-1,lines:[]};
+  const lines=[];let maxLevel=0;
+  if(axis==='骨格'){
+    const d1=ITF_SK_CO[sk+'_'+color];
+    const d2=gender==='f'?ITF_SK_FA_F[sk+'_'+face]:null;
+    if(d1){maxLevel=Math.max(maxLevel,d1[0]);lines.push(`骨格×カラー：${d1[1]}`);}
+    if(d2){maxLevel=Math.max(maxLevel,d2[0]);lines.push(`骨格×顔タイプ：${d2[1]}`);}
+  } else if(axis==='カラー'){
+    const d1=ITF_SK_CO[sk+'_'+color];
+    const d2=gender==='f'?ITF_CO_FA_F[color+'_'+face]:null;
+    if(d1){maxLevel=Math.max(maxLevel,d1[0]);lines.push(`骨格×カラー：${d1[1]}`);}
+    if(d2){maxLevel=Math.max(maxLevel,d2[0]);lines.push(`カラー×顔タイプ：${d2[1]}`);}
+  } else if(axis==='顔タイプ'){
+    const d1=gender==='f'?ITF_SK_FA_F[sk+'_'+face]:null;
+    const d2=gender==='f'?ITF_CO_FA_F[color+'_'+face]:null;
+    if(d1){maxLevel=Math.max(maxLevel,d1[0]);lines.push(`骨格×顔タイプ：${d1[1]}`);}
+    if(d2){maxLevel=Math.max(maxLevel,d2[0]);lines.push(`カラー×顔タイプ：${d2[1]}`);}
+  }
+  return{level:maxLevel,lines};
+}
+
+function ur(){
+  const sk=gsk(),face=document.getElementById('face-m').textContent,color=gseason();
+  const yb=parseInt(document.getElementById('yb').value);
+  document.getElementById('r-sk').textContent=sk.t==='—'?'—':sk.t+'（'+sk.sc+'点）';
+  document.getElementById('r-co').textContent=color;
+  document.getElementById('r-fa').textContent=face;
+  const ybDev=Math.abs(yb-50)*2;
+  const auto=ybDev>=80?'カラー':sk.sc>=10?'骨格':'顔タイプ';
+  document.getElementById('ax-auto').textContent=auto;
+  document.querySelectorAll('.axbtn').forEach(b=>b.classList.toggle('active',b.textContent===manualAxis));
+  if(!manualAxis||face==='—'||sk.t==='—'){
+    document.getElementById('r-in').innerHTML='<span style="color:#aaa;font-size:12px">魅力軸を選択してください</span>';
+    document.getElementById('rr-detail').style.display='none';
+    return;
+  }
+  const{level,lines}=calcInterference(manualAxis,sk.t,color,face);
+  document.getElementById('r-in').innerHTML=itfBadge(level);
+  if(lines.length>0){
+    document.getElementById('rr-detail').style.display='flex';
+    document.getElementById('r-detail').innerHTML=lines.map(l=>`<div>・${l}</div>`).join('');
+  } else {
+    document.getElementById('rr-detail').style.display='none';
+  }
+}
+
+function sw(name){
+  document.querySelectorAll('.tab').forEach((t,i)=>{['face','skel','color','result'].forEach((n,j)=>{if(i===j)t.classList.toggle('active',n===name);});});
+  document.querySelectorAll('.pnl').forEach(p=>p.classList.remove('active'));
+  document.getElementById('p-'+name).classList.add('active');
+  if(name==='result')ur();
+}
+
+bAge();bCur();bSk();buildMatrix();uc();
+</script>
+</body>
+</html>
