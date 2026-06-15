@@ -66,6 +66,28 @@ h1{font-size:15px;font-weight:500;color:#666;letter-spacing:.05em;margin-bottom:
 .axbtn.active{background:#e8f0fc;color:#2a5cc8;border-color:transparent}
 .hint{font-size:11px;color:#aaa;margin-top:4px}
 .itf-detail{font-size:11px;color:#666;margin-top:4px;line-height:1.6}
+.kanpe-tabs{display:flex;gap:4px;margin-bottom:.75rem;flex-wrap:wrap}
+.kanpe-tab{padding:5px 10px;font-size:11px;font-weight:500;border-radius:6px;background:#f5f4f0;border:.5px solid #ddd;color:#888;cursor:pointer;white-space:nowrap}
+.kanpe-tab.active{background:#e8f0fc;color:#2a5cc8;border-color:transparent}
+.kanpe-pnl{display:none}.kanpe-pnl.active{display:block}
+.flow-step{background:#f5f4f0;border-radius:8px;padding:.6rem .9rem;margin-bottom:.5rem;font-size:12px;color:#333;line-height:1.6}
+.flow-step .step-label{font-size:10px;font-weight:600;color:#888;letter-spacing:.05em;margin-bottom:2px}
+.flow-arrow{text-align:center;color:#bbb;font-size:12px;margin:.1rem 0}
+.flow-branch{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:.5rem}
+.flow-branch-item{background:#fff;border:.5px solid #ddd;border-radius:8px;padding:.5rem .75rem;font-size:11px;color:#555;line-height:1.5}
+.flow-branch-item .branch-label{font-size:10px;font-weight:600;color:#aaa;margin-bottom:2px}
+.cmp-row{display:grid;grid-template-columns:60px 1fr 1fr;gap:6px;padding:5px 0;border-bottom:.5px solid #eee;align-items:start;font-size:11px}
+.cmp-row:last-child{border-bottom:none}
+.cmp-row.hd{font-size:10px;color:#aaa;font-weight:600}
+.cmp-cat{color:#888;font-size:10px;line-height:1.4}
+.cmp-sp{color:#e07020}
+.cmp-au{color:#8B4513}
+.cmp-su{color:#4169E1}
+.cmp-wi{color:#1a1a18}
+.cmp-name{font-weight:500;margin-bottom:1px}
+.cmp-colors{font-size:10px;color:#888;line-height:1.5}
+.note-item{font-size:12px;color:#444;padding:.4rem .6rem;background:#f5f4f0;border-radius:6px;margin-bottom:.4rem;line-height:1.6}
+.note-item strong{color:#2a5cc8}
 </style>
 </head>
 <body>
@@ -131,7 +153,10 @@ h1{font-size:15px;font-weight:500;color:#666;letter-spacing:.05em;margin-bottom:
     <div class="sr"><span class="sl" id="vcl">50%</span><input type="range" id="cl" min="0" max="100" value="50" oninput="uc()"></div>
   </div>
   <div class="card">
-    <div class="stitle">4シーズン判定</div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem">
+      <div class="stitle" style="margin-bottom:0">4シーズン判定</div>
+      <button onclick="toggleKanpe()" id="kanpe-btn" style="font-size:11px;padding:4px 10px;border-radius:6px;background:#f5f4f0;border:.5px solid #ddd;color:#666;cursor:pointer">カンペを見る 📋</button>
+    </div>
     <div class="sg">
       <div></div><div class="mh">澄んだ</div><div class="mh">くすみ</div>
       <div class="mh" style="writing-mode:vertical-rl">イエベ</div>
@@ -143,6 +168,76 @@ h1{font-size:15px;font-weight:500;color:#666;letter-spacing:.05em;margin-bottom:
     </div>
   </div>
 </div>
+
+<!-- お助け色カンペ -->
+  <div class="card" id="kanpe-card" style="display:none">
+    <div class="stitle">お助け色カンペ</div>
+    <div class="kanpe-tabs">
+      <button class="kanpe-tab active" onclick="swKanpe('drape')">ドレープの使い方</button>
+      <button class="kanpe-tab" onclick="swKanpe('yb')">イエローベース</button>
+      <button class="kanpe-tab" onclick="swKanpe('bb')">ブルーベース</button>
+      <button class="kanpe-tab" onclick="swKanpe('note')">補足カンペ</button>
+    </div>
+
+    <!-- ドレープの使い方 -->
+    <div class="kanpe-pnl active" id="kp-drape">
+      <div class="flow-step"><div class="step-label">STEP 1</div>テストドレープを当てる</div>
+      <div class="flow-arrow">▼</div>
+      <div class="flow-branch">
+        <div class="flow-branch-item"><div class="branch-label">ベースが絞れない場合</div>消去法で1つずつ絞り込む<br>or<br>ベースは関係なく2シーズンで比較</div>
+        <div class="flow-branch-item"><div class="branch-label">ベースで迷った場合</div>↓の順で試す</div>
+      </div>
+      <div class="flow-step"><div class="step-label">ベース迷い時 ①</div>🥇 金銀ドレープ<br><span style="font-size:11px;color:#888">ゴールド→イエベ　シルバー→ブルベ</span></div>
+      <div class="flow-arrow">▼</div>
+      <div class="flow-step"><div class="step-label">ベース迷い時 ②</div>🎨 代表色<br><span style="font-size:11px;color:#888">オータム：バーミリオン（色相のみ比較）<br>ウィンター：アザレピンク（色相のみ比較）</span></div>
+      <div class="flow-arrow">▼</div>
+      <div class="flow-step"><div class="step-label">ベース迷い時 ③</div>🌑 ベーシックカラー（低明度）<br><span style="font-size:11px;color:#888">スプリング：キャメル　サマー：ダークブルーフォグ<br>・ブルベ＋キャメル → 肌着っぽく見える<br>・イエベ＋ダークブルーフォグ → 色が抜けて寂しく見える</span></div>
+      <div class="flow-arrow">▼</div>
+      <div class="flow-step"><div class="step-label">ベース迷い時 ④</div>🌕 ベーシックカラー（高明度）<br><span style="font-size:11px;color:#888">スプリング：フローラルホワイト　サマー：ブルーミスト<br>※低明度とセットで見るとわかりやすい</span></div>
+      <div class="flow-arrow">▼</div>
+      <div class="flow-step"><div class="step-label">ベース迷い時 ⑤</div>🌗 中明度中彩度<br><span style="font-size:11px;color:#888">迷いやすい色：オレンジ・ピンク（チーク）・紫・緑</span></div>
+      <div class="flow-arrow">▼</div>
+      <div class="flow-branch">
+        <div class="flow-branch-item"><div class="branch-label">イエベ確定</div>スプリング vs オータムで比較</div>
+        <div class="flow-branch-item"><div class="branch-label">ブルベ確定</div>サマー vs ウィンターで比較</div>
+      </div>
+    </div>
+
+    <!-- イエローベース -->
+    <div class="kanpe-pnl" id="kp-yb">
+      <div class="cmp-row hd"><div>カテゴリ</div><div class="cmp-sp">🌸 スプリング</div><div class="cmp-au">🍂 オータム</div></div>
+      <div class="cmp-row"><div class="cmp-cat">彩度比較①<br>オレンジ</div><div><div class="cmp-name cmp-sp">ルミナスコーラル</div></div><div><div class="cmp-name cmp-au">タイガーリリー</div></div></div>
+      <div class="cmp-row"><div class="cmp-cat">彩度比較②<br>パープル</div><div><div class="cmp-name cmp-sp">アイリス</div></div><div><div class="cmp-name cmp-au">プラム</div></div></div>
+      <div class="cmp-row"><div class="cmp-cat">ベーシック①<br>紺</div><div><div class="cmp-name cmp-sp">ロンドン<br>トワイライト</div></div><div><div class="cmp-name cmp-au">ダークロンドン<br>トワイライト</div></div></div>
+      <div class="cmp-row"><div class="cmp-cat">ベーシック②<br>グレー</div><div><div class="cmp-name cmp-sp">カント</div></div><div><div class="cmp-name cmp-au">モスグレイ</div></div></div>
+      <div class="cmp-row"><div class="cmp-cat">高彩度①<br>レッド</div><div><div class="cmp-name cmp-sp">トマトレッド</div></div><div><div class="cmp-name cmp-au">ダークカーディナル</div></div></div>
+      <div class="cmp-row"><div class="cmp-cat">高明度②<br>イエロー</div><div><div class="cmp-name cmp-sp">カナリアイエロー</div></div><div><div class="cmp-name cmp-au">クロムイエロー</div></div></div>
+      <div class="cmp-row"><div class="cmp-cat">グラデ①</div><div><div class="cmp-colors">カーネーションピンク<br>ミモザ<br>ターコイズ</div></div><div><div class="cmp-colors">テラコッタ<br>マスタード<br>オリーブグリーン</div></div></div>
+      <div class="cmp-row"><div class="cmp-cat">グラデ②</div><div><div class="cmp-colors">ピーチピンク<br>ライトアクア<br>ハニーイエロー</div></div><div><div class="cmp-colors">ナイルブルー<br>コルク<br>ペールアプリコット</div></div></div>
+    </div>
+
+    <!-- ブルーベース -->
+    <div class="kanpe-pnl" id="kp-bb">
+      <div class="cmp-row hd"><div>カテゴリ</div><div class="cmp-su">☁️ サマー</div><div class="cmp-wi">❄️ ウィンター</div></div>
+      <div class="cmp-row"><div class="cmp-cat">高彩度①<br>赤紫</div><div><div class="cmp-name cmp-su">ラズベリー</div></div><div><div class="cmp-name cmp-wi">ラズベリーレッド</div></div></div>
+      <div class="cmp-row"><div class="cmp-cat">高明度②<br>グリーン</div><div><div class="cmp-name cmp-su">ミントグリーン</div></div><div><div class="cmp-name cmp-wi">パイングリーン</div></div></div>
+      <div class="cmp-row"><div class="cmp-cat">ベーシック①<br>紺</div><div><div class="cmp-name cmp-su">インクブルー</div></div><div><div class="cmp-name cmp-wi">ノクターン</div></div></div>
+      <div class="cmp-row"><div class="cmp-cat">ベーシック②<br>グレー</div><div><div class="cmp-name cmp-su">ダークブルー<br>フォグ</div></div><div><div class="cmp-name cmp-wi">チャコールグレイ</div></div></div>
+      <div class="cmp-row"><div class="cmp-cat">高彩度①<br>ブルー</div><div><div class="cmp-name cmp-su">ウェッジウッド<br>ブルー</div></div><div><div class="cmp-name cmp-wi">コバルトブルー</div></div></div>
+      <div class="cmp-row"><div class="cmp-cat">高明度②<br>パープル</div><div><div class="cmp-name cmp-su">ペールライラック</div></div><div><div class="cmp-name cmp-wi">パウダーパープル</div></div></div>
+      <div class="cmp-row"><div class="cmp-cat">グラデ①</div><div><div class="cmp-colors">ラベンダー<br>ゼファブルー<br>イタリアンローズ</div></div><div><div class="cmp-colors">アザレアピンク<br>コバルトブルー<br>ロイヤルパープル</div></div></div>
+      <div class="cmp-row"><div class="cmp-cat">グラデ②</div><div><div class="cmp-colors">ベビーピンク<br>ペールライラック<br>ペールアクア</div></div><div><div class="cmp-colors">レモンティント<br>パウダーピンク<br>アクアティント</div></div></div>
+    </div>
+
+    <!-- 補足カンペ -->
+    <div class="kanpe-pnl" id="kp-note">
+      <div class="note-item">🌸 <strong>スプリング</strong>：やたらと高明度が似合う人がいる</div>
+      <div class="note-item">💛 <strong>黄色</strong>：明度全体的に高め</div>
+      <div class="note-item">❤️ <strong>赤・白</strong>：明度・彩度はあまり変わらない（使用するドレープ）</div>
+      <div class="note-item">🤎 <strong>茶色の判定</strong>：ベージュ → スプリング　／　ローズブラウン → サマー</div>
+      <div class="note-item">🔄 <strong>色相比較ペア</strong>：オータム「バーミリオン」↔ ウィンター「アザレピンク」<br><span style="font-size:11px;color:#888">色相だけを比較する</span></div>
+    </div>
+  </div>
 
 <!-- 判定結果 -->
 <div class="pnl" id="p-result">
@@ -530,6 +625,21 @@ function sw(name){
   if(name==='result')ur();
 }
 
+function swKanpe(name){
+  document.querySelectorAll('.kanpe-tab').forEach((t,i)=>{
+    const names=['drape','yb','bb','note'];
+    t.classList.toggle('active',names[i]===name);
+  });
+  document.querySelectorAll('.kanpe-pnl').forEach(p=>p.classList.remove('active'));
+  document.getElementById('kp-'+name).classList.add('active');
+}
+function toggleKanpe(){
+  const card=document.getElementById('kanpe-card');
+  const btn=document.getElementById('kanpe-btn');
+  const visible=card.style.display!=='none';
+  card.style.display=visible?'none':'block';
+  btn.textContent=visible?'カンペを見る 📋':'カンペを閉じる ✕';
+}
 bAge();bCur();bSk();buildMatrix();uc();
 </script>
 </body>
