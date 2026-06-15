@@ -115,6 +115,13 @@ h1{font-size:15px;font-weight:500;color:#666;letter-spacing:.05em;margin-bottom:
   <div class="card">
     <div class="stitle">顔タイプ判定マトリクス</div>
     <div id="matrix-wrap"></div>
+    <div id="sh-select" style="display:none;margin-top:.75rem;padding-top:.75rem;border-top:.5px solid #eee">
+      <div class="stitle" style="margin-bottom:.5rem">ソフト / ハードを選択</div>
+      <div class="gtoggle">
+        <button class="gbtn" id="sh-s" onclick="setManSH('ソフト')">ソフト</button>
+        <button class="gbtn" id="sh-h" onclick="setManSH('ハード')">ハード</button>
+      </div>
+    </div>
     <div class="sbar" style="margin-top:.5rem">
       <div class="chip" style="text-align:center;flex:2">
         <div class="cl">判定結果</div>
@@ -281,6 +288,7 @@ h1{font-size:15px;font-weight:500;color:#666;letter-spacing:.05em;margin-bottom:
 <script>
 let gender='f';
 let manualAxis=null;
+let manSH=null;
 
 const ITF_SK_CO={
   'ストレート_スプリング':[1,'メリハリ×ハリ感で相性◎','ベーシックにメリハリ展開'],
@@ -451,7 +459,22 @@ function buildMatrix(){
   cf();
 }
 
-function setGender(g){gender=g;document.getElementById('gb-f').classList.toggle('active',g==='f');document.getElementById('gb-m').classList.toggle('active',g==='m');buildMatrix();}
+function setManSH(sh){
+  manSH=sh;
+  document.getElementById('sh-s').classList.toggle('active',sh==='ソフト');
+  document.getElementById('sh-h').classList.toggle('active',sh==='ハード');
+  cf();
+}
+function setGender(g){
+  gender=g;
+  manSH=null;
+  document.getElementById('gb-f').classList.toggle('active',g==='f');
+  document.getElementById('gb-m').classList.toggle('active',g==='m');
+  document.getElementById('sh-select').style.display=g==='m'?'block':'none';
+  document.getElementById('sh-s').classList.remove('active');
+  document.getElementById('sh-h').classList.remove('active');
+  buildMatrix();
+}
 function setAxis(ax){manualAxis=ax;document.querySelectorAll('.axbtn').forEach(b=>b.classList.toggle('active',b.textContent===ax));ur();}
 
 function bAge(){
@@ -539,10 +562,16 @@ function cf(){
   } else {
     const isA=ap>cp,isC=cv>lp;
     if(cp>0||ap>0){
-      if(isA&&isC){ft='エレガント';document.getElementById('mc-els')?.classList.add('on');document.getElementById('mc-elh')?.classList.add('on');}
-      else if(isA&&!isC){ft='クール';document.getElementById('mc-cls')?.classList.add('on');document.getElementById('mc-clh')?.classList.add('on');}
-      else if(!isA&&isC){ft='チャーミング';document.getElementById('mc-chs')?.classList.add('on');document.getElementById('mc-chh')?.classList.add('on');}
-      else{ft='フレッシュ';document.getElementById('mc-fls')?.classList.add('on');document.getElementById('mc-flh')?.classList.add('on');}
+      let base;
+      if(isA&&isC) base='エレガント';
+      else if(isA&&!isC) base='クール';
+      else if(!isA&&isC) base='チャーミング';
+      else base='フレッシュ';
+      // ソフト/ハードが手動選択済みならそのセルだけ、未選択なら両方ハイライト
+      const sfx=manSH?[manSH==='ソフト'?'s':'h']:['s','h'];
+      const pfx={エレガント:'el',クール:'cl',チャーミング:'ch',フレッシュ:'fl'};
+      sfx.forEach(s=>document.getElementById('mc-'+pfx[base]+s)?.classList.add('on'));
+      ft=manSH?base+manSH:base;
     }
   }
   document.getElementById('face-m').textContent=ft;
@@ -653,21 +682,43 @@ function genProposal(){
     alert('骨格・顔タイプ・カラーをすべて入力してから生成してください');return;
   }
   const axis=manualAxis||document.getElementById('ax-auto').textContent;
-  const skKey=sk.t+'_'+color,faKey=color+'_'+face,sfKey=sk.t+'_'+face;
-  const d1=ITF_SK_CO[skKey],d2=ITF_CO_FA_F[faKey],d3=ITF_SK_FA_F[sfKey];
-  const hint1=d1?d1[2]:'';
-  const hint2=d2?d2[2]:'';
-  const hint3=d3?d3[2]:'';
-  const text=`【診断結果サマリー】
+  const d1=ITF_SK_CO[sk.t+'_'+color];
+  const d2=gender==='f'?ITF_SK_FA_F[sk.t+'_'+face]:null;
+  const d3=gender==='f'?ITF_CO_FA_F[color+'_'+face]:null;
+
+  // 軸ごとの説明文
+  const axisDesc={
+    '骨格':'骨格の得意なシルエット・素材感を軸にスタイリングを組み立てると最もバランスよく垢抜けます。',
+    'カラー':'パーソナルカラーを軸に色・素材感を選ぶことで、顔まわりが明るく映え、全体の印象が整います。',
+    '顔タイプ':'顔タイプに合ったデザインやディテールを軸にすることで、顔立ちとスタイルの一体感が生まれます。',
+  };
+
+  // 干渉TIPSをまとめる
+  const tips=[];
+  if(d1)tips.push(d1[2]);
+  if(d2)tips.push(d2[2]);
+  if(d3)tips.push(d3[2]);
+
+  // 最高相性の組み合わせを探す（レベル0が最高）
+  const allData=[d1,d2,d3].filter(Boolean);
+  const best=allData.filter(d=>d[0]<=1);
+  const bestMsg=best.length?best[0][1]:'';
+
+  const text=
+`◆ 診断結果
 骨格：${sk.t}　カラー：${color}　顔タイプ：${face}
 魅力軸：${axis}
 
-【スタイリング提案】
-${hint1?'▶ 骨格×カラー：'+hint1:''}
-${hint3&&gender==='f'?'▶ 骨格×顔タイプ：'+hint3:''}
-${hint2&&gender==='f'?'▶ カラー×顔タイプ：'+hint2:''}
+◆ ${axis}を主役に
+${axisDesc[axis]||''}
+${bestMsg?'\n▶ 特に「'+bestMsg+'」の組み合わせが強みです。':''}
 
-あなたの魅力軸「${axis}」を主役に、得意な要素を組み合わせてスタイリングすると最も垢抜けた印象になります。`;
+◆ スタイリングのポイント
+${tips.map((t,i)=>['骨格×カラー','骨格×顔タイプ','カラー×顔タイプ'][i]+'：'+t).join('\n')}
+
+◆ まとめ
+${sk.t}骨格×${color}×${face}タイプのあなたは、${tips[0]||'素材とカラーをバランスよく取り入れると'}スタイリングが最もはまります。「${axis}」の強みを活かしながら、他2軸の干渉を上手にコントロールすることが垢抜けのカギです。`;
+
   document.getElementById('proposal-text').textContent=text.trim();
   document.getElementById('proposal-area').style.display='block';
 }
