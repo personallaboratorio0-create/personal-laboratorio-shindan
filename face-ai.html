@@ -30,7 +30,7 @@ header span{font-size:11px;color:var(--accent2);letter-spacing:.1em;font-family:
 .upload-area{border:1.5px dashed var(--border);border-radius:4px;padding:16px;text-align:center;cursor:pointer;transition:all .2s;position:relative;background:var(--bg);min-height:180px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;}
 .upload-area:hover,.upload-area.dragover{border-color:var(--accent);background:rgba(196,168,130,.08);}
 .upload-area.has-image{border-style:solid;border-color:var(--accent);}
-.upload-area input[type="file"]{display:none;}
+.upload-area input[type="file"]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
 .upload-icon{font-size:28px;opacity:.4;}
 .upload-label{font-size:13px;font-weight:400;}
 .upload-sub{font-size:11px;color:var(--accent2);font-family:"Noto Sans JP",sans-serif;}
@@ -38,7 +38,7 @@ header span{font-size:11px;color:var(--accent2);letter-spacing:.1em;font-family:
 .preview-img.visible{display:block;}
 .upload-placeholder{display:flex;flex-direction:column;align-items:center;gap:6px;}
 .upload-placeholder.hidden{display:none;}
-.remove-btn{position:absolute;top:6px;right:6px;width:22px;height:22px;border-radius:50%;background:var(--accent2);color:white;border:none;cursor:pointer;font-size:10px;display:none;align-items:center;justify-content:center;}
+.remove-btn{position:absolute;top:6px;right:6px;z-index:10;width:22px;height:22px;border-radius:50%;background:var(--accent2);color:white;border:none;cursor:pointer;font-size:10px;display:none;align-items:center;justify-content:center;}
 .remove-btn.visible{display:flex;}
 
 /* 判定ボタン */
@@ -155,26 +155,30 @@ header span{font-size:11px;color:var(--accent2);letter-spacing:.1em;font-family:
   <div class="card">
     <div class="card-title">写真をアップロード</div>
     <div class="upload-grid">
-      <label class="upload-area" id="upload-front" ondragover="onDragOver(event,'front')" ondragleave="onDragLeave('front')" ondrop="onDrop(event,'front')">
-        <input type="file" id="input-front" accept="image/*" style="display:none" onchange="onFileSelect(event,'front')">
-        <div class="upload-placeholder" id="placeholder-front">
-          <div class="upload-icon">🖼</div>
-          <div class="upload-label">正面写真</div>
-          <div class="upload-sub">タップまたはドロップ</div>
-        </div>
-        <img class="preview-img" id="preview-front" alt="正面">
+      <div style="position:relative">
+        <label class="upload-area" id="upload-front" ondragover="onDragOver(event,'front')" ondragleave="onDragLeave('front')" ondrop="onDrop(event,'front')">
+          <input type="file" id="input-front" accept="image/*" onchange="onFileSelect(event,'front')">
+          <div class="upload-placeholder" id="placeholder-front">
+            <div class="upload-icon">🖼</div>
+            <div class="upload-label">正面写真</div>
+            <div class="upload-sub">タップまたはドロップ</div>
+          </div>
+          <img class="preview-img" id="preview-front" alt="正面">
+        </label>
         <button class="remove-btn" id="remove-front" onclick="removeImage(event,'front')">✕</button>
-      </label>
-      <label class="upload-area" id="upload-side" ondragover="onDragOver(event,'side')" ondragleave="onDragLeave('side')" ondrop="onDrop(event,'side')">
-        <input type="file" id="input-side" accept="image/*" style="display:none" onchange="onFileSelect(event,'side')">
-        <div class="upload-placeholder" id="placeholder-side">
-          <div class="upload-icon">🖼</div>
-          <div class="upload-label">横顔写真（任意）</div>
-          <div class="upload-sub">タップまたはドロップ</div>
-        </div>
-        <img class="preview-img" id="preview-side" alt="横顔">
+      </div>
+      <div style="position:relative">
+        <label class="upload-area" id="upload-side" ondragover="onDragOver(event,'side')" ondragleave="onDragLeave('side')" ondrop="onDrop(event,'side')">
+          <input type="file" id="input-side" accept="image/*" onchange="onFileSelect(event,'side')">
+          <div class="upload-placeholder" id="placeholder-side">
+            <div class="upload-icon">🖼</div>
+            <div class="upload-label">横顔写真（任意）</div>
+            <div class="upload-sub">タップまたはドロップ</div>
+          </div>
+          <img class="preview-img" id="preview-side" alt="横顔">
+        </label>
         <button class="remove-btn" id="remove-side" onclick="removeImage(event,'side')">✕</button>
-      </label>
+      </div>
     </div>
     <button class="analyze-btn" id="analyze-btn" onclick="analyze()" disabled>✦ AI で顔タイプを判定する</button>
     <div class="loading" id="loading"><span class="spinner"></span>Claude が写真を分析中です…（10〜20秒）</div>
