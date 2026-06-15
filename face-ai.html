@@ -160,8 +160,8 @@ header span{font-size:11px;color:var(--accent2);letter-spacing:.1em;font-family:
         <div class="upload-label" id="label-front">正面写真</div>
         <div class="upload-sub">ドロップ、または↓のボタンで選択</div>
         <img class="preview-img" id="preview-front" alt="正面">
-        <input type="file" id="input-front" accept="image/*" style="display:none">
-        <button class="upload-btn" onclick="document.getElementById('input-front').click()">📂 写真を選ぶ</button>
+        <input type="file" id="input-front" accept="image/*" style="position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;">
+        <label for="input-front" class="upload-btn">📂 写真を選ぶ</label>
         <button class="remove-btn" id="remove-front" onclick="removeImage(event,'front')">✕</button>
       </div>
       <div class="upload-box" id="upload-side" ondragover="onDragOver(event,'side')" ondragleave="onDragLeave('side')" ondrop="onDrop(event,'side')">
@@ -169,8 +169,8 @@ header span{font-size:11px;color:var(--accent2);letter-spacing:.1em;font-family:
         <div class="upload-label" id="label-side">横顔写真（任意）</div>
         <div class="upload-sub">ドロップ、または↓のボタンで選択</div>
         <img class="preview-img" id="preview-side" alt="横顔">
-        <input type="file" id="input-side" accept="image/*" style="display:none">
-        <button class="upload-btn" onclick="document.getElementById('input-side').click()">📂 写真を選ぶ</button>
+        <input type="file" id="input-side" accept="image/*" style="position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;">
+        <label for="input-side" class="upload-btn">📂 写真を選ぶ</label>
         <button class="remove-btn" id="remove-side" onclick="removeImage(event,'side')">✕</button>
       </div>
     </div>
