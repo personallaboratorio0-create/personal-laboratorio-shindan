@@ -151,6 +151,15 @@ header span{font-size:11px;color:var(--accent2);letter-spacing:.1em;font-family:
     </div>
   </div>
 
+  <!-- 性別選択 -->
+  <div class="card">
+    <div class="card-title">診断対象</div>
+    <div style="display:flex;gap:8px;">
+      <button id="gb-f" onclick="setGender('f')" style="flex:1;padding:10px;font-size:13px;font-weight:400;border-radius:3px;background:var(--text);color:var(--white);border:none;cursor:pointer;font-family:'Noto Serif JP',serif;letter-spacing:.06em;">女性</button>
+      <button id="gb-m" onclick="setGender('m')" style="flex:1;padding:10px;font-size:13px;font-weight:400;border-radius:3px;background:var(--bg);color:var(--accent2);border:1px solid var(--border);cursor:pointer;font-family:'Noto Serif JP',serif;letter-spacing:.06em;">男性</button>
+    </div>
+  </div>
+
   <!-- 写真アップロード -->
   <div class="card">
     <div class="card-title">写真をアップロード</div>
@@ -198,7 +207,8 @@ header span{font-size:11px;color:var(--accent2);letter-spacing:.1em;font-family:
         <div class="score-num" id="txt-shape">—</div>
       </div>
     </div>
-    <div class="face-matrix">
+    <!-- 女性マトリクス -->
+    <div class="face-matrix" id="matrix-f">
       <div></div><div class="mh">子供顔</div><div class="mh">中間</div><div class="mh">大人顔</div>
       <div class="mrl">曲線</div>
       <div class="mc" id="mc-0">キュート</div>
@@ -208,6 +218,16 @@ header span{font-size:11px;color:var(--accent2);letter-spacing:.1em;font-family:
       <div class="mc" id="mc-3">アクティブキュート<br><span style="font-size:9px;opacity:.7">/ フレッシュ</span></div>
       <div class="mc" id="mc-4">クールカジュアル</div>
       <div class="mc" id="mc-5">エレガント<br><span style="font-size:9px;opacity:.7">/ クール</span></div>
+    </div>
+    <!-- 男性マトリクス -->
+    <div style="display:none;grid-template-columns:52px 1fr 1fr;grid-template-rows:22px 1fr 1fr;gap:4px;margin-bottom:16px;" id="matrix-m">
+      <div></div><div class="mh">子供顔</div><div class="mh">大人顔</div>
+      <div class="mrl">曲線</div>
+      <div class="mc" id="mc-m-ch">チャーミング<br><span style="font-size:9px;opacity:.7">ハード/ソフト</span></div>
+      <div class="mc" id="mc-m-el">エレガント<br><span style="font-size:9px;opacity:.7">ハード/ソフト</span></div>
+      <div class="mrl">直線</div>
+      <div class="mc" id="mc-m-fr">フレッシュ<br><span style="font-size:9px;opacity:.7">ハード/ソフト</span></div>
+      <div class="mc" id="mc-m-cl">クール<br><span style="font-size:9px;opacity:.7">ハード/ソフト</span></div>
     </div>
 
     <div class="card-title" style="margin-top:10px">世代感 各項目（9項目）</div>
@@ -225,7 +245,18 @@ header span{font-size:11px;color:var(--accent2);letter-spacing:.1em;font-family:
 <script>
 const GEN_LABELS=["顔の縦横バランス","目の大きさ","パーツ比率①おでこ","パーツ比率③あご先","目の比率","鼻根の高さ","顔の立体感","目の角度","口の大きさ"];
 const SHAPE_LABELS=["顔全体","おでこ","フェイスライン","頬","鼻筋","目・形（左）","目・形（右）","目・印象（左）","目・印象（右）","眉","唇"];
-const TYPE_MAP={"キュート":0,"フェミニン":1,"ソフトエレガント":2,"アクティブキュート":3,"フレッシュ":3,"クールカジュアル":4,"エレガント":5,"クール":5};
+const TYPE_MAP_F={"キュート":0,"フェミニン":1,"ソフトエレガント":2,"アクティブキュート":3,"フレッシュ":3,"クールカジュアル":4,"エレガント":5,"クール":5};
+const TYPE_MAP_M={"チャーミングハード":"ch","チャーミングソフト":"ch","チャーミング":"ch","フレッシュハード":"fr","フレッシュソフト":"fr","フレッシュ":"fr","クールハード":"cl","クールソフト":"cl","クール":"cl","エレガントハード":"el","エレガントソフト":"el","エレガント":"el"};
+let gender='f';
+function setGender(g){
+  gender=g;
+  document.getElementById('gb-f').style.background=g==='f'?'var(--text)':'var(--bg)';
+  document.getElementById('gb-f').style.color=g==='f'?'var(--white)':'var(--accent2)';
+  document.getElementById('gb-m').style.background=g==='m'?'var(--text)':'var(--bg)';
+  document.getElementById('gb-m').style.color=g==='m'?'var(--white)':'var(--accent2)';
+  document.getElementById('matrix-f').style.display=g==='f'?'grid':'none';
+  document.getElementById('matrix-m').style.display=g==='m'?'grid':'none';
+}
 
 let imgDataFront=null,imgDataSide=null;
 let imgFileFront=null,imgFileSide=null;
@@ -361,15 +392,20 @@ async function analyze(){
 10. 眉: 曲線・薄い=曲線 / 直線・濃い=直線
 11. 唇: 厚い=曲線 / 薄い=直線
 
-## 顔タイプ判定基準
-- 子供顔 × 曲線多め → キュート
+## 顔タイプ判定基準（${gender==='m'?'男性版':'女性版'}）
+${gender==='m'?`- 子供顔 × 曲線 → チャーミング（ハード or ソフトも判定）
+- 子供顔 × 直線 → フレッシュ（ハード or ソフトも判定）
+- 大人顔 × 曲線 → エレガント（ハード or ソフトも判定）
+- 大人顔 × 直線 → クール（ハード or ソフトも判定）
+※ ハード=骨格感・目鼻立ちがはっきり強い / ソフト=穏やか・優しい印象
+※ faceTypeは「チャーミングハード」「フレッシュソフト」のように返してください`:`- 子供顔 × 曲線多め → キュート
 - 子供顔 × 曲線多め（パーツが大きい・強い） → アクティブキュート
 - 子供顔 × 混合 → フレッシュ
 - 子供顔 × 直線多め → クールカジュアル
 - 大人顔 × 曲線多め → フェミニン
 - 大人顔 × 混合（パーツ小さめ） → ソフトエレガント
 - 大人顔 × 混合（パーツ大きめ） → エレガント
-- 大人顔 × 直線多め → クール
+- 大人顔 × 直線多め → クール`}
 
 ## 回答形式（必ずこのJSON形式で回答してください）
 \`\`\`json
@@ -462,9 +498,16 @@ function showResult(r){
   document.getElementById('bar-shape').style.width=shapeTotal>0?((lineCnt/shapeTotal)*100)+'%':'50%';
   document.getElementById('txt-shape').textContent=`曲線${curveCnt} / 普通${shapeVals.filter(v=>v==='普通').length} / 直線${lineCnt}`;
 
-  // マトリクス
+  // マトリクスハイライト
   for(let i=0;i<=5;i++)document.getElementById('mc-'+i).classList.remove('active');
-  if(r.faceType in TYPE_MAP)document.getElementById('mc-'+TYPE_MAP[r.faceType]).classList.add('active');
+  ['ch','fr','cl','el'].forEach(k=>{const el=document.getElementById('mc-m-'+k);if(el)el.classList.remove('active');});
+  if(gender==='m'){
+    const key=TYPE_MAP_M[r.faceType];
+    if(key)document.getElementById('mc-m-'+key)?.classList.add('active');
+  } else {
+    const TYPE_MAP=TYPE_MAP_F;
+    if(r.faceType in TYPE_MAP)document.getElementById('mc-'+TYPE_MAP[r.faceType]).classList.add('active');
+  }
 
   // 世代感 各項目
   const gc=document.getElementById('gen-items');gc.innerHTML='';
