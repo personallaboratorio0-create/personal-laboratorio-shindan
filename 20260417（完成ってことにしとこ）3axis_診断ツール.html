@@ -66,6 +66,11 @@ h1{font-size:15px;font-weight:500;color:#666;letter-spacing:.05em;margin-bottom:
 .axbtn.active{background:#e8f0fc;color:#2a5cc8;border-color:transparent}
 .hint{font-size:11px;color:#aaa;margin-top:4px}
 .itf-detail{font-size:11px;color:#666;margin-top:4px;line-height:1.6}
+.itf-card{background:#fff;border:.5px solid #e0e0dc;border-radius:12px;padding:1rem 1.25rem;margin-bottom:.6rem}
+.itf-card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem}
+.itf-card-title{font-size:12px;font-weight:600;color:#888;letter-spacing:.04em}
+.itf-card-reason{font-size:13px;font-weight:500;color:#1a1a18;margin-bottom:.35rem;line-height:1.5}
+.itf-card-tip{font-size:11px;color:#666;line-height:1.6;padding:.4rem .6rem;background:#f5f4f0;border-radius:6px}
 .kanpe-tabs{display:flex;gap:4px;margin-bottom:.75rem;flex-wrap:wrap}
 .kanpe-tab{padding:5px 10px;font-size:11px;font-weight:500;border-radius:6px;background:#f5f4f0;border:.5px solid #ddd;color:#888;cursor:pointer;white-space:nowrap}
 .kanpe-tab.active{background:#e8f0fc;color:#2a5cc8;border-color:transparent}
@@ -256,11 +261,12 @@ h1{font-size:15px;font-weight:500;color:#666;letter-spacing:.05em;margin-bottom:
         <div class="hint">自動参考：<span id="ax-auto">—</span></div>
       </div>
     </div>
-    <div class="rr"><span class="rl">干渉レベル</span><span class="rv" id="r-in">—</span></div>
-    <div class="rr" id="rr-detail" style="display:none">
-      <span class="rl">干渉詳細</span>
-      <div class="rv" id="r-detail" style="font-size:12px;font-weight:400;line-height:1.6;text-align:right"></div>
-    </div>
+  </div>
+  <div id="itf-cards" style="display:none;margin-top:.75rem">
+    <div class="stitle" style="margin-bottom:.5rem">干渉チェック</div>
+    <div id="card-sk-co" class="itf-card"></div>
+    <div id="card-sk-fa" class="itf-card" style="display:none"></div>
+    <div id="card-co-fa" class="itf-card" style="display:none"></div>
   </div>
   <div id="proposal-area" style="display:none;margin-top:.75rem">
     <div style="background:#f5f4f0;border-radius:10px;padding:1rem 1.25rem">
@@ -600,6 +606,19 @@ function calcInterference(axis,sk,color,face){
   return{level:maxLevel,lines};
 }
 
+function makeCard(elId, title, data, show){
+  const el=document.getElementById(elId);
+  el.style.display=show?'block':'none';
+  if(!show||!data)return;
+  const[lv,reason,tip]=data;
+  el.innerHTML=`
+    <div class="itf-card-header">
+      <span class="itf-card-title">${title}</span>
+      ${itfBadge(lv)}
+    </div>
+    <div class="itf-card-reason">${reason}</div>
+    <div class="itf-card-tip">💡 ${tip}</div>`;
+}
 function ur(){
   const sk=gsk(),face=document.getElementById('face-m').textContent,color=gseason();
   const yb=parseInt(document.getElementById('yb').value);
@@ -610,19 +629,15 @@ function ur(){
   const auto=ybDev>=80?'カラー':sk.sc>=10?'骨格':'顔タイプ';
   document.getElementById('ax-auto').textContent=auto;
   document.querySelectorAll('.axbtn').forEach(b=>b.classList.toggle('active',b.textContent===manualAxis));
-  if(!manualAxis||face==='—'||sk.t==='—'){
-    document.getElementById('r-in').innerHTML='<span style="color:#aaa;font-size:12px">魅力軸を選択してください</span>';
-    document.getElementById('rr-detail').style.display='none';
-    return;
-  }
-  const{level,lines}=calcInterference(manualAxis,sk.t,color,face);
-  document.getElementById('r-in').innerHTML=itfBadge(level);
-  if(lines.length>0){
-    document.getElementById('rr-detail').style.display='flex';
-    document.getElementById('r-detail').innerHTML=lines.map(l=>`<div>・${l}</div>`).join('');
-  } else {
-    document.getElementById('rr-detail').style.display='none';
-  }
+  const ready=sk.t!=='—'&&face!=='—';
+  document.getElementById('itf-cards').style.display=ready?'block':'none';
+  if(!ready)return;
+  const d1=ITF_SK_CO[sk.t+'_'+color]||null;
+  const d2=gender==='f'?(ITF_SK_FA_F[sk.t+'_'+face]||null):null;
+  const d3=gender==='f'?(ITF_CO_FA_F[color+'_'+face]||null):null;
+  makeCard('card-sk-co','骨格 × カラー',d1,!!d1);
+  makeCard('card-sk-fa','骨格 × 顔タイプ',d2,!!d2);
+  makeCard('card-co-fa','カラー × 顔タイプ',d3,!!d3);
 }
 
 function sw(name){
