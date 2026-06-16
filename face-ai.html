@@ -288,41 +288,53 @@ header span{font-size:11px;color:var(--accent2);letter-spacing:.1em;font-family:
   <div class="axis-pnl" id="ap-skel">
     <div class="card">
       <div class="card-title">撮影ガイド（骨格）</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
         <div style="background:var(--bg);border-radius:3px;padding:12px;">
-          <div style="font-size:12px;font-weight:400;margin-bottom:6px;">正面全身</div>
+          <div style="font-size:12px;font-weight:400;margin-bottom:6px;">①正面全身（必須）</div>
           <ul style="list-style:none;font-size:11px;color:var(--accent2);font-family:'Noto Sans JP',sans-serif;">
-            <li>— 全身が入る距離</li><li>— 腕を自然に下げる</li><li>— 薄着（体のラインがわかる服）</li><li>— 正面向き・直立</li>
+            <li>— 全身が入る</li><li>— 薄着・直立</li><li>— 腕は自然に下げる</li>
           </ul>
         </div>
         <div style="background:var(--bg);border-radius:3px;padding:12px;">
-          <div style="font-size:12px;font-weight:400;margin-bottom:6px;">横向き全身</div>
+          <div style="font-size:12px;font-weight:400;margin-bottom:6px;">②横向き全身（任意）</div>
           <ul style="list-style:none;font-size:11px;color:var(--accent2);font-family:'Noto Sans JP',sans-serif;">
-            <li>— 真横（体のシルエットがわかる）</li><li>— 薄着</li><li>— 自然に立つ</li>
+            <li>— 真横</li><li>— 薄着</li><li>— 体の厚みがわかる</li>
+          </ul>
+        </div>
+        <div style="background:rgba(196,168,130,.15);border-radius:3px;padding:12px;border:1px solid var(--accent);">
+          <div style="font-size:12px;font-weight:400;margin-bottom:6px;">③手のアップ（推奨）</div>
+          <ul style="list-style:none;font-size:11px;color:var(--accent2);font-family:'Noto Sans JP',sans-serif;">
+            <li>— 手の甲・手首が見える</li><li>— 指を自然に伸ばす</li><li>— 骨・爪が見える明るさ</li>
           </ul>
         </div>
       </div>
     </div>
     <div class="card">
       <div class="card-title">写真をアップロード（骨格）</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
         <div class="upload-box" id="upload-sk-front" ondragover="onDragOver2(event,'sk-front')" ondragleave="onDragLeave2('sk-front')" ondrop="onDrop2(event,'sk-front')">
           <div class="upload-icon" id="icon-sk-front">🖼</div>
-          <div id="label-sk-front" style="font-size:13px;">正面全身</div>
-          <div style="font-size:11px;color:var(--accent2);font-family:'Noto Sans JP',sans-serif;">↓のボタンで選択</div>
+          <div id="label-sk-front" style="font-size:12px;">①正面全身</div>
           <img class="preview-img" id="preview-sk-front" alt="正面全身">
           <input type="file" id="input-sk-front" accept="image/*" multiple style="position:absolute;width:1px;height:1px;opacity:0;">
-          <label for="input-sk-front" class="upload-btn">📂 写真を選ぶ</label>
+          <label for="input-sk-front" class="upload-btn" style="font-size:11px;">📂 選ぶ</label>
           <button class="remove-btn" id="remove-sk-front" onclick="removeImg2(event,'sk-front')">✕</button>
         </div>
         <div class="upload-box" id="upload-sk-side" ondragover="onDragOver2(event,'sk-side')" ondragleave="onDragLeave2('sk-side')" ondrop="onDrop2(event,'sk-side')">
           <div class="upload-icon" id="icon-sk-side">🖼</div>
-          <div id="label-sk-side" style="font-size:13px;">横向き全身（任意）</div>
-          <div style="font-size:11px;color:var(--accent2);font-family:'Noto Sans JP',sans-serif;">↓のボタンで選択</div>
+          <div id="label-sk-side" style="font-size:12px;">②横向き全身</div>
           <img class="preview-img" id="preview-sk-side" alt="横向き全身">
           <input type="file" id="input-sk-side" accept="image/*" style="position:absolute;width:1px;height:1px;opacity:0;">
-          <label for="input-sk-side" class="upload-btn">📂 写真を選ぶ</label>
+          <label for="input-sk-side" class="upload-btn" style="font-size:11px;">📂 選ぶ</label>
           <button class="remove-btn" id="remove-sk-side" onclick="removeImg2(event,'sk-side')">✕</button>
+        </div>
+        <div class="upload-box" id="upload-sk-hand" ondragover="onDragOver2(event,'sk-hand')" ondragleave="onDragLeave2('sk-hand')" ondrop="onDrop2(event,'sk-hand')" style="border-color:var(--accent);">
+          <div class="upload-icon" id="icon-sk-hand">🤚</div>
+          <div id="label-sk-hand" style="font-size:12px;">③手のアップ</div>
+          <img class="preview-img" id="preview-sk-hand" alt="手">
+          <input type="file" id="input-sk-hand" accept="image/*" style="position:absolute;width:1px;height:1px;opacity:0;">
+          <label for="input-sk-hand" class="upload-btn" style="font-size:11px;">📂 選ぶ</label>
+          <button class="remove-btn" id="remove-sk-hand" onclick="removeImg2(event,'sk-hand')">✕</button>
         </div>
       </div>
       <button class="analyze-btn" id="analyze-sk-btn" onclick="analyzeSkel()" disabled style="margin-top:12px;">✦ 骨格タイプを判定する</button>
@@ -452,35 +464,62 @@ async function analyzeSkel(){
     const frontUrl=await fileToBase64(skFiles['sk-front']);
     const content=[{type:'image',source:{type:'base64',media_type:getMimeType(frontUrl),data:toBase64(frontUrl)}}];
     if(skFiles['sk-side']){const sideUrl=await fileToBase64(skFiles['sk-side']);content.push({type:'image',source:{type:'base64',media_type:getMimeType(sideUrl),data:toBase64(sideUrl)}});}
-    const prompt=`あなたは骨格診断の専門家です。写真から骨格タイプ（ストレート・ウェーブ・ナチュラル）を判定してください。
+    if(skFiles['sk-hand']){const handUrl=await fileToBase64(skFiles['sk-hand']);content.push({type:'image',source:{type:'base64',media_type:getMimeType(handUrl),data:toBase64(handUrl)}});}
+    const prompt=`あなたは日本の骨格診断の専門家です。写真から骨格タイプ（ストレート・ウェーブ・ナチュラル）を判定してください。
 
-## 各部位の判定基準
-重心：上半身重心=ストレート / 下半身重心=ウェーブ / 全体的=ナチュラル
-首：短め・太め=ストレート / 長め・細め=ウェーブ / 普通=ナチュラル
-鎖骨：目立たない=ストレート / 細く繊細=ウェーブ / がっしり=ナチュラル
-バストライン：高め・厚み=ストレート / 低め・ほぼない=ウェーブ / 普通=ナチュラル
-腰位置：高い=ストレート / 低い=ウェーブ / 普通=ナチュラル
-体のシルエット：Iライン=ストレート / Xライン=ウェーブ / Hライン=ナチュラル
-骨感：なし・肉感=ストレート / なし・薄い=ウェーブ / あり=ナチュラル
-膝：目立たない=ストレート / 少し丸みあり=ウェーブ / 大きく目立つ=ナチュラル
+## 重要な注意点
+- ストレートに過剰判定しないよう注意してください
+- 「普通」「どちらでもない」はストレートではなくナチュラルとして扱います
+- 手の写真がある場合、手首・爪・手の厚みは非常に重要な判断材料です
+- 写真枚数が少ない場合は確信度を「低〜中」にしてください
+
+## 各部位の判定基準（S=ストレート W=ウェーブ N=ナチュラル）
+
+【全身・体型】
+重心：上半身が重い・胸元が目立つ=S / ウエストが細くヒップが目立つ=W / 全身に均等な厚み=N
+体のシルエット：上半身にボリューム・Iライン=S / Xライン・ウエストくびれ強い=W / どっしりHライン・骨っぽい=N
+体の厚み（横から）：前後に厚みあり=S / 薄い=W / 骨張った厚み=N
+肩：なで肩寄り=S・W / 怒り肩・肩幅広め=N
+
+【首・鎖骨】
+首：短め・太め=S / 長め・細め=W / 普通=N
+鎖骨：目立たない・埋まっている=S / 細く繊細に見える=W / がっしり・太く目立つ=N
+
+【バスト・ウエスト・腰】
+バストライン：位置が高く厚みがある=S / 位置が低くほぼフラット=W / 普通=N
+腰位置：高い=S / 低い=W / 普通=N
+腰の張り：ヒップへのカーブが緩やか=S / Xラインで張りがある=W / 四角く張っている=N
+
+【手・指・爪】（手の写真がある場合は必ず判定）
+手首の骨：目立たない=S / 細い=W / 骨が出っ張って目立つ=N
+手の厚み・大きさ：普通～やや厚め=S / 薄くて小さい=W / 大きく骨っぽい=N
+爪の形：四角く短め=S / 縦長でほっそり=W / 大きく形がしっかりしている=N
+指の関節：目立たない=S / 細くて目立たない=W / 関節が目立つ=N
+
+【膝・二の腕】
+膝：目立たない・丸みあり=S / 少し丸みあり=W / 大きく骨ばって目立つ=N
+二の腕：筋肉質・ハリあり=S / 細くて柔らかい=W / 骨が見える・骨っぽい=N
 
 ## 回答形式（必ずこのJSON形式で）
 \`\`\`json
 {
-  "skelType": "ストレート",
-  "confidence": "中（正面写真のみのため）",
-  "scores": {"ストレート": 6, "ウェーブ": 2, "ナチュラル": 1},
+  "skelType": "ナチュラル",
+  "confidence": "中（全身+手写真あり）",
+  "scores": {"ストレート": 3, "ウェーブ": 2, "ナチュラル": 8},
   "items": {
-    "重心": "ストレート",
+    "重心": "ナチュラル",
+    "体のシルエット": "ナチュラル",
     "首": "ストレート",
-    "鎖骨": "ウェーブ",
+    "鎖骨": "ナチュラル",
     "バストライン": "ストレート",
-    "腰位置": "ストレート",
-    "体のシルエット": "ストレート",
-    "骨感": "ウェーブ",
-    "膝": "ナチュラル"
+    "腰位置": "ナチュラル",
+    "手首の骨": "ナチュラル",
+    "手の厚み": "ナチュラル",
+    "爪の形": "ウェーブ",
+    "膝": "ナチュラル",
+    "二の腕": "ウェーブ"
   },
-  "reason": "上半身に重心があり、バストラインが高く厚みがある点がストレートの特徴と一致します。"
+  "reason": "手首の骨が目立ち、鎖骨もがっしりしている点がナチュラルの特徴と一致します。"
 }
 \`\`\``;
     content.push({type:'text',text:prompt});
@@ -655,6 +694,9 @@ document.getElementById('input-sk-front').addEventListener('change',function(){
 });
 document.getElementById('input-sk-side').addEventListener('change',function(){
   if(this.files&&this.files[0])loadImg2(this.files[0],'sk-side');
+});
+document.getElementById('input-sk-hand').addEventListener('change',function(){
+  if(this.files&&this.files[0])loadImg2(this.files[0],'sk-hand');
 });
 document.getElementById('input-co').addEventListener('change',function(){
   if(this.files&&this.files[0])loadImg2(this.files[0],'co');
