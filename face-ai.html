@@ -377,6 +377,68 @@ header span{font-size:11px;color:var(--accent2);letter-spacing:.1em;font-family:
           <button class="remove-btn" id="remove-co" onclick="removeImg2(event,'co')">✕</button>
         </div>
       </div>
+      <!-- 補足情報 -->
+      <div style="margin-top:14px;">
+        <div class="card-title" style="margin-bottom:10px;">補足情報（任意・精度アップ）</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          <div>
+            <div style="font-size:11px;color:var(--accent2);font-family:'Noto Sans JP',sans-serif;margin-bottom:4px;">日焼けのタイプ</div>
+            <select id="co-sunburn" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:3px;background:var(--bg);font-family:'Noto Sans JP',sans-serif;font-size:12px;color:var(--text);">
+              <option value="">選択してください</option>
+              <option value="赤くなって焼けにくい（ブルベ傾向）">赤くなって焼けにくい</option>
+              <option value="黒くなりやすい（イエベ傾向）">黒くなりやすい</option>
+              <option value="どちらでもない">どちらでもない</option>
+            </select>
+          </div>
+          <div>
+            <div style="font-size:11px;color:var(--accent2);font-family:'Noto Sans JP',sans-serif;margin-bottom:4px;">クマの色</div>
+            <select id="co-kuma" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:3px;background:var(--bg);font-family:'Noto Sans JP',sans-serif;font-size:12px;color:var(--text);">
+              <option value="">選択してください</option>
+              <option value="青紫・灰色（ブルベ傾向）">青紫・灰色</option>
+              <option value="茶色・黄色み（イエベ傾向）">茶色・黄色み</option>
+              <option value="ほぼない・目立たない">ほぼない</option>
+            </select>
+          </div>
+          <div>
+            <div style="font-size:11px;color:var(--accent2);font-family:'Noto Sans JP',sans-serif;margin-bottom:4px;">似合うアクセサリー</div>
+            <select id="co-acc" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:3px;background:var(--bg);font-family:'Noto Sans JP',sans-serif;font-size:12px;color:var(--text);">
+              <option value="">選択してください</option>
+              <option value="ゴールドが似合う（イエベ傾向）">ゴールドが似合う</option>
+              <option value="シルバーが似合う（ブルベ傾向）">シルバーが似合う</option>
+              <option value="どちらも似合う">どちらも似合う</option>
+            </select>
+          </div>
+          <div>
+            <div style="font-size:11px;color:var(--accent2);font-family:'Noto Sans JP',sans-serif;margin-bottom:4px;">地毛の色</div>
+            <select id="co-hair" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:3px;background:var(--bg);font-family:'Noto Sans JP',sans-serif;font-size:12px;color:var(--text);">
+              <option value="">選択してください</option>
+              <option value="黒に近い（暗め）">黒に近い（暗め）</option>
+              <option value="こげ茶（やや暗め）">こげ茶（やや暗め）</option>
+              <option value="茶色（明るめ）">茶色（明るめ）</option>
+              <option value="かなり明るい茶・柔らかい">かなり明るい茶・柔らかい</option>
+            </select>
+          </div>
+          <div>
+            <div style="font-size:11px;color:var(--accent2);font-family:'Noto Sans JP',sans-serif;margin-bottom:4px;">肌の色感</div>
+            <select id="co-skin" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:3px;background:var(--bg);font-family:'Noto Sans JP',sans-serif;font-size:12px;color:var(--text);">
+              <option value="">選択してください</option>
+              <option value="かなり色白">かなり色白</option>
+              <option value="普通〜やや明るい">普通〜やや明るい</option>
+              <option value="やや暗め・ベージュ系">やや暗め・ベージュ系</option>
+              <option value="濃いめ・ダーク系">濃いめ・ダーク系</option>
+            </select>
+          </div>
+          <div>
+            <div style="font-size:11px;color:var(--accent2);font-family:'Noto Sans JP',sans-serif;margin-bottom:4px;">得意な口紅の系統</div>
+            <select id="co-lip" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:3px;background:var(--bg);font-family:'Noto Sans JP',sans-serif;font-size:12px;color:var(--text);">
+              <option value="">選択してください</option>
+              <option value="オレンジ・コーラル系が得意（イエベ傾向）">オレンジ・コーラル系が得意</option>
+              <option value="ピンク・ローズ系が得意（ブルベ傾向）">ピンク・ローズ系が得意</option>
+              <option value="どちらも似合う">どちらも似合う</option>
+            </select>
+          </div>
+        </div>
+      </div>
       <button class="analyze-btn" id="analyze-co-btn" onclick="analyzeColor()" disabled style="margin-top:12px;">✦ パーソナルカラーを判定する</button>
       <div class="loading" id="loading-co"><span class="spinner"></span>Claude が分析中です…</div>
       <div class="error-msg" id="error-co"></div>
@@ -562,6 +624,11 @@ async function analyzeColor(){
   document.getElementById('loading-co').classList.add('active');
   document.getElementById('error-co').classList.remove('active');
   document.getElementById('result-co').classList.remove('active');
+  // 補足情報を収集
+  const extras=[];
+  const fields=[['co-sunburn','日焼けのタイプ'],['co-kuma','クマの色'],['co-acc','似合うアクセサリー'],['co-hair','地毛の色'],['co-skin','肌の色感'],['co-lip','得意な口紅系統']];
+  fields.forEach(([id,label])=>{const v=document.getElementById(id)?.value;if(v)extras.push(`${label}：${v}`);});
+  const extraText=extras.length>0?`\n\n## お客様の補足情報（写真と合わせて重視してください）\n${extras.join('\n')}`:'';
   try{
     const dataUrl=await fileToBase64(coFile);
     const content=[
@@ -578,7 +645,7 @@ async function analyzeColor(){
 スプリング：イエベ×明るい×澄んだ
 オータム：イエベ×暗め×くすみ
 サマー：ブルベ×明るい×くすみ
-ウィンター：ブルベ×明るい～暗め×澄んだ・コントラスト強
+ウィンター：ブルベ×明るい～暗め×澄んだ・コントラスト強${extraText}
 
 ## 回答形式（必ずJSON）
 \`\`\`json
