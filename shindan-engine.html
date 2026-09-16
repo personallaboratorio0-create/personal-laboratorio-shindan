@@ -93,6 +93,16 @@ h1{font-size:15px;font-weight:500;color:#666;letter-spacing:.05em;margin-bottom:
 .cmp-colors{font-size:10px;color:#888;line-height:1.5}
 .note-item{font-size:12px;color:#444;padding:.4rem .6rem;background:#f5f4f0;border-radius:6px;margin-bottom:.4rem;line-height:1.6}
 .note-item strong{color:#2a5cc8}
+.kp-label{font-size:10px;font-weight:600;color:#888;letter-spacing:.05em;margin:.6rem 0 .2rem}
+.kp-tags{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:.35rem}
+.kp-tag{font-size:11px;padding:2px 7px;border-radius:99px;background:#f0f0ee;color:#444}
+.kp-tag.ng{background:#fde8e8;color:#c82a2a}
+.kp-tag.cmp-sp{color:#e07020}.kp-tag.cmp-au{color:#8B4513}.kp-tag.cmp-su{color:#4169E1}
+.kp-catch{font-size:12px;font-weight:600;color:#1a1a18;padding:.35rem .6rem;background:#f5f4f0;border-radius:6px;margin-bottom:.4rem}
+.kp-tmpl{font-size:11px;color:#444;line-height:1.7;padding:.4rem .6rem;background:#f5f4f0;border-radius:6px;margin-top:.35rem}
+.skel-ktab{padding:5px 10px;font-size:11px;font-weight:500;border-radius:6px;background:#f5f4f0;border:.5px solid #ddd;color:#888;cursor:pointer;white-space:nowrap}
+.skel-ktab.active{background:#e8f0fc;color:#2a5cc8;border-color:transparent}
+.skel-kpnl{display:none}.skel-kpnl.active{display:block}
 </style>
 </head>
 <body>
@@ -115,13 +125,7 @@ h1{font-size:15px;font-weight:500;color:#666;letter-spacing:.05em;margin-bottom:
   <div class="card">
     <div class="stitle">顔タイプ判定マトリクス</div>
     <div id="matrix-wrap"></div>
-    <div id="sh-select" style="display:none;margin-top:.75rem;padding-top:.75rem;border-top:.5px solid #eee">
-      <div class="stitle" style="margin-bottom:.5rem">ソフト / ハードを選択</div>
-      <div class="gtoggle">
-        <button class="gbtn" id="sh-s" onclick="setManSH('ソフト')">ソフト</button>
-        <button class="gbtn" id="sh-h" onclick="setManSH('ハード')">ハード</button>
-      </div>
-    </div>
+
     <div class="sbar" style="margin-top:.5rem">
       <div class="chip" style="text-align:center;flex:2">
         <div class="cl">判定結果</div>
@@ -150,6 +154,68 @@ h1{font-size:15px;font-weight:500;color:#666;letter-spacing:.05em;margin-bottom:
     <div class="skr hd"><div>部位</div><div style="text-align:center">S</div><div style="text-align:center">W</div><div style="text-align:center">N</div><div style="text-align:center">未</div></div>
     <div id="sk-c"></div>
     <div class="sbar" id="sk-b"></div>
+  </div>
+  <!-- 骨格カンペ -->
+  <div class="card" id="skel-kanpe-card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.6rem">
+      <div class="stitle" style="margin-bottom:0">骨格タイプ別カンペ</div>
+      <button onclick="toggleSkelKanpe()" id="skel-kanpe-btn" style="font-size:11px;padding:4px 10px;border-radius:6px;background:#f5f4f0;border:.5px solid #ddd;color:#666;cursor:pointer">カンペを見る 📋</button>
+    </div>
+    <div id="skel-kanpe-body" style="display:none">
+      <div style="display:flex;gap:4px;margin-bottom:.75rem;flex-wrap:wrap">
+        <button class="skel-ktab active" data-skp="s" onclick="swSkelKanpe('s')">S ストレート</button>
+        <button class="skel-ktab" data-skp="w" onclick="swSkelKanpe('w')">W ウェーブ</button>
+        <button class="skel-ktab" data-skp="n" onclick="swSkelKanpe('n')">N ナチュラル</button>
+      </div>
+      <!-- S -->
+      <div class="skel-kpnl active" id="skp-s">
+        <div class="kp-catch">正統派の着こなしが映えるメリハリある体型｜Iライン・上重心</div>
+        <div class="kp-label">▶ 得意素材</div>
+        <div class="kp-tags"><span class="kp-tag">コットン（ハリ）</span><span class="kp-tag">シルク</span><span class="kp-tag">ウール（ハイゲージ）</span><span class="kp-tag">カシミヤ</span><span class="kp-tag">レーヨン（光沢）</span><span class="kp-tag">サテン</span><span class="kp-tag">表革</span><span class="kp-tag">デニム（ノンウォッシュ）</span></div>
+        <div class="kp-label">▶ NG素材</div>
+        <div class="kp-tags"><span class="kp-tag ng">モヘヤ</span><span class="kp-tag ng">ベロア</span><span class="kp-tag ng">ツイード</span><span class="kp-tag ng">キルティング</span><span class="kp-tag ng">麻</span><span class="kp-tag ng">シフォン</span><span class="kp-tag ng">スエード</span></div>
+        <div class="kp-label">▶ 似合う柄</div>
+        <div class="kp-tags"><span class="kp-tag">大柄・規則的</span><span class="kp-tag">大花柄（コントラスト強）</span><span class="kp-tag">太めボーダー</span><span class="kp-tag">ストライプ（Iライン）</span><span class="kp-tag">大ドット</span><span class="kp-tag">バーバリーチェック</span></div>
+        <div class="kp-label">▶ アイテム</div>
+        <div class="note-item" style="margin-bottom:.3rem">👕 <strong>トップス：</strong>ベーシックシャツ・テーラードジャケット・V/Uネックニット</div>
+        <div class="note-item" style="margin-bottom:.3rem">👖 <strong>ボトムス：</strong>ストレートパンツ・センタープレス・タイトスカート</div>
+        <div class="note-item" style="margin-bottom:.3rem">👜 <strong>バッグ：</strong>大きめ・自立型（ケリー風・バーキン風・ボストン）</div>
+        <div class="note-item">👠 <strong>靴：</strong>シンプル・ツヤなし表革・パンプス・ローファー</div>
+        <div class="kp-tmpl">〇〇さんの骨格タイプはストレートです。上半身に厚みがある上重心のメリハリ体型で、ジャストサイズが最もスタイルアップして見えます。コットン・シルク・カシミヤなど上質な素材を積極的に取り入れ、Iラインを意識した直線的なシルエットで首元や胸元を開けてスッキリ見せると上品でオシャレな印象になります。</div>
+      </div>
+      <!-- W -->
+      <div class="skel-kpnl" id="skp-w">
+        <div class="kp-catch">華やかで女性らしいスタイルが似合うカーヴィ体型｜X・Yライン・下重心</div>
+        <div class="kp-label">▶ 得意素材</div>
+        <div class="kp-tags"><span class="kp-tag">コットン（やわらか）</span><span class="kp-tag">ベロア</span><span class="kp-tag">アンゴラ</span><span class="kp-tag">モヘア</span><span class="kp-tag">レーヨン（薄い）</span><span class="kp-tag">シフォン</span><span class="kp-tag">サテン（ドレープ）</span><span class="kp-tag">レース</span><span class="kp-tag">スエード</span></div>
+        <div class="kp-label">▶ NG素材</div>
+        <div class="kp-tags"><span class="kp-tag ng">麻</span><span class="kp-tag ng">デニム（粗い）</span><span class="kp-tag ng">表革（重厚）</span></div>
+        <div class="kp-label">▶ 似合う柄</div>
+        <div class="kp-tags"><span class="kp-tag">小柄・小花柄</span><span class="kp-tag">コントラスト弱め</span><span class="kp-tag">細ボーダー</span><span class="kp-tag">小ドット</span><span class="kp-tag">千鳥格子（細）</span><span class="kp-tag">タータン（細）</span></div>
+        <div class="kp-label">▶ アイテム</div>
+        <div class="note-item" style="margin-bottom:.3rem">👕 <strong>トップス：</strong>レーヨン・シフォン素材・フリル・レース装飾付き</div>
+        <div class="note-item" style="margin-bottom:.3rem">👖 <strong>ボトムス：</strong>スカート全般得意・パンツは細身ストレッチ・足首丈</div>
+        <div class="note-item" style="margin-bottom:.3rem">👜 <strong>バッグ：</strong>小さめ・柔らかい素材</div>
+        <div class="note-item">👠 <strong>靴：</strong>装飾付き・先端丸み / 帽子：ベレー帽</div>
+        <div class="kp-tmpl">〇〇さんの骨格タイプはウェーブです。下半身に重心がある女性らしい曲線ボディが特徴です。フリルやレース・プリーツといった装飾性の高いアイテムがよく映えます。シルクシフォン・レーヨン・アンゴラなど軽くてソフトな素材を選び、XまたはYラインを意識してウエストを締めるとスタイルアップして見えます。</div>
+      </div>
+      <!-- N -->
+      <div class="skel-kpnl" id="skp-n">
+        <div class="kp-catch">遊びがスタイリッシュになるモデル体型｜Y・Aライン・平面感</div>
+        <div class="kp-label">▶ 得意素材</div>
+        <div class="kp-tags"><span class="kp-tag">綿（ダンガリー・ガーゼ）</span><span class="kp-tag">麻（シワ加工）</span><span class="kp-tag">ウール（ローゲージ）</span><span class="kp-tag">ブリティッシュツイード</span><span class="kp-tag">コーデュロイ</span><span class="kp-tag">デニム（ダメージ）</span><span class="kp-tag">バックスキン</span></div>
+        <div class="kp-label">▶ NG素材</div>
+        <div class="kp-tags"><span class="kp-tag ng">シンプルすぎる薄地</span><span class="kp-tag ng">光沢素材（単体使い）</span></div>
+        <div class="kp-label">▶ 似合う柄</div>
+        <div class="kp-tags"><span class="kp-tag">大柄・不規則</span><span class="kp-tag">ボタニカル</span><span class="kp-tag">迷彩（大）</span><span class="kp-tag">アニマル（ゼブラ・パイソン）</span><span class="kp-tag">エスニック</span><span class="kp-tag">幾何学（不規則）</span></div>
+        <div class="kp-label">▶ アイテム</div>
+        <div class="note-item" style="margin-bottom:.3rem">👕 <strong>トップス：</strong>ローゲージニット・洗いざらしシャツ・ロングカーディガン</div>
+        <div class="note-item" style="margin-bottom:.3rem">👖 <strong>ボトムス：</strong>ワイドパンツ・カーゴ・デニム・マキシ丈スカート</div>
+        <div class="note-item" style="margin-bottom:.3rem">👜 <strong>バッグ：</strong>大きめ・個性的（バーキン・リュック・バケツ）</div>
+        <div class="note-item">👠 <strong>靴：</strong>先が尖る・厚底・スニーカー・装飾アクセント</div>
+        <div class="kp-tmpl">〇〇さんの骨格タイプはナチュラルです。骨や関節が際立つ平面的な骨格で肩周りにフレーム感があります。麻やリネンなどオーバーサイズを纏うことで逆説的な女性らしさが引き立ちます。天然素材のザクザク・ボコボコした生地感がお得意で、YまたはAラインを意識しながら長さで下重心をつくるとこなれ感のあるスタイルに仕上がります。</div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -184,10 +250,14 @@ h1{font-size:15px;font-weight:500;color:#666;letter-spacing:.05em;margin-bottom:
   <div class="card" id="kanpe-card" style="display:none">
     <div class="stitle">お助け色カンペ</div>
     <div class="kanpe-tabs">
-      <button class="kanpe-tab active" onclick="swKanpe('drape')">ドレープの使い方</button>
-      <button class="kanpe-tab" onclick="swKanpe('yb')">イエローベース</button>
-      <button class="kanpe-tab" onclick="swKanpe('bb')">ブルーベース</button>
-      <button class="kanpe-tab" onclick="swKanpe('note')">補足カンペ</button>
+      <button class="kanpe-tab active" data-kp="drape" onclick="swKanpe('drape')">ドレープの使い方</button>
+      <button class="kanpe-tab" data-kp="yb" onclick="swKanpe('yb')">イエローベース</button>
+      <button class="kanpe-tab" data-kp="bb" onclick="swKanpe('bb')">ブルーベース</button>
+      <button class="kanpe-tab" data-kp="note" onclick="swKanpe('note')">補足カンペ</button>
+      <button class="kanpe-tab" data-kp="sp" onclick="swKanpe('sp')">🌸 春</button>
+      <button class="kanpe-tab" data-kp="su" onclick="swKanpe('su')">☁️ 夏</button>
+      <button class="kanpe-tab" data-kp="au" onclick="swKanpe('au')">🍂 秋</button>
+      <button class="kanpe-tab" data-kp="wi" onclick="swKanpe('wi')">❄️ 冬</button>
     </div>
 
     <!-- ドレープの使い方 -->
@@ -248,6 +318,62 @@ h1{font-size:15px;font-weight:500;color:#666;letter-spacing:.05em;margin-bottom:
       <div class="note-item">🤎 <strong>茶色の判定</strong>：ベージュ → スプリング　／　ローズブラウン → サマー</div>
       <div class="note-item">🔄 <strong>色相比較ペア</strong>：オータム「バーミリオン」↔ ウィンター「アザレピンク」<br><span style="font-size:11px;color:#888">色相だけを比較する</span></div>
     </div>
+
+    <!-- スプリング -->
+    <div class="kanpe-pnl" id="kp-sp">
+      <div class="kp-catch">🌸 スプリング｜イエベ・明るめ・キュートな印象</div>
+      <div class="kp-label">▶ 特徴（肌・髪・瞳）</div>
+      <div class="note-item" style="margin-bottom:.3rem">肌：ツヤ感と透明感がある<br>髪：明るいブラウン〜ダークブラウン・艶やかで繊細<br>瞳：やや明るいイエローブラウン・くすみなく澄んでいる</div>
+      <div class="kp-label">▶ 得意な色</div>
+      <div class="kp-tags"><span class="kp-tag cmp-sp">オレンジレッド</span><span class="kp-tag cmp-sp">ストロングオレンジ</span><span class="kp-tag cmp-sp">アクアブルー</span><span class="kp-tag cmp-sp">アップルグリーン</span><span class="kp-tag cmp-sp">カナリーイエロー</span><span class="kp-tag cmp-sp">アイボリー</span></div>
+      <div class="kp-label">▶ メイクのコツ</div>
+      <div class="note-item" style="margin-bottom:.3rem">💄 <strong>ファンデ：</strong>ツヤ感を一部でも<br>👁 <strong>アイ：</strong>ショコラブラウン・ブラウンピーチ・キャメルブラウン<br>🌸 <strong>チーク：</strong>コーラルピンク・カーネーションピンク・フラミンゴ<br>💋 <strong>リップ：</strong>スカーレット・ポピーレッド・ルミナスコーラル</div>
+      <div class="kp-label">▶ コーデのコツ</div>
+      <div class="kp-tags"><span class="kp-tag">黄みのある色を意識</span><span class="kp-tag">ゴールドアクセ</span><span class="kp-tag">明るい色を小物でアクセント</span></div>
+      <div class="kp-tmpl">〇〇さんのパーソナルカラーはスプリング（春）です。イエローベースの明るくカラフルなカラーグループがよくお似合いになります。お肌にはツヤ感と透明感があり、アクアブルーやコーラルピンクなどの鮮やかな色を身につけると生き生きとした血色が出て顔全体が明るく輝きます。</div>
+    </div>
+
+    <!-- サマー -->
+    <div class="kanpe-pnl" id="kp-su">
+      <div class="kp-catch">☁️ サマー｜ブルベ・明るめソフト・エレガントな印象</div>
+      <div class="kp-label">▶ 特徴（肌・髪・瞳）</div>
+      <div class="note-item" style="margin-bottom:.3rem">肌：透明感があり、きめ細やかな印象<br>髪：ソフトで柔らかい暗髪<br>瞳：ソフトな黒色・白目とのコントラストが柔らかい</div>
+      <div class="kp-label">▶ 得意な色</div>
+      <div class="kp-tags"><span class="kp-tag cmp-su">ソフトフューシャ</span><span class="kp-tag cmp-su">ウォーターメロン</span><span class="kp-tag cmp-su">ミントグリーン</span><span class="kp-tag cmp-su">スカイブルー</span><span class="kp-tag cmp-su">ライラック</span><span class="kp-tag cmp-su">オフホワイト</span></div>
+      <div class="kp-label">▶ メイクのコツ</div>
+      <div class="note-item" style="margin-bottom:.3rem">💄 <strong>ファンデ：</strong>マットベース＋パール感で品良く<br>👁 <strong>アイ：</strong>ローズベージュ・ライラック・ライトモーヴ・ブルーグレー<br>🌸 <strong>チーク：</strong>淡いピンク・ライトモーヴ（ほお骨に沿って）<br>💋 <strong>リップ：</strong>ラズベリー・ウォーターメロン・ピンク系全般</div>
+      <div class="kp-label">▶ コーデのコツ</div>
+      <div class="kp-tags"><span class="kp-tag">パステル配色が得意</span><span class="kp-tag">同一系・類似系でまとめる</span><span class="kp-tag">シルバー（光沢控えめ）</span><span class="kp-tag">パール最適</span></div>
+      <div class="kp-tmpl">〇〇さんのパーソナルカラーはサマー（夏）です。ブルーベースの淡くソフトなカラーグループがよくお似合いになります。お肌には透明感ときめ細やかさがあり、ミントグリーンやスカイブルーなどのグレイッシュな色を身につけると色白でなめらかな美しい肌が際立ちます。小物はシルバーやパールを選ぶとエレガントな印象がより引き立ちます。</div>
+    </div>
+
+    <!-- オータム -->
+    <div class="kanpe-pnl" id="kp-au">
+      <div class="kp-catch">🍂 オータム｜イエベ・暗め複雑・ゴージャスな印象</div>
+      <div class="kp-label">▶ 特徴（肌・髪・瞳）</div>
+      <div class="note-item" style="margin-bottom:.3rem">肌：陶器のようにマットで滑らか<br>髪：落ち着いた深みのある茶・ハリコシがある<br>瞳：ダークブラウン・白目と黒目のコントラストが緩やか</div>
+      <div class="kp-label">▶ 得意な色</div>
+      <div class="kp-tags"><span class="kp-tag cmp-au">ラスト・コパー</span><span class="kp-tag cmp-au">ディープオレンジ</span><span class="kp-tag cmp-au">マスタード</span><span class="kp-tag cmp-au">モスグリーン</span><span class="kp-tag cmp-au">カーキ</span><span class="kp-tag cmp-au">ターコイズグリーン</span><span class="kp-tag cmp-au">オイスターホワイト</span></div>
+      <div class="kp-label">▶ メイクのコツ</div>
+      <div class="note-item" style="margin-bottom:.3rem">💄 <strong>ファンデ：</strong>マット系・ベージュ系<br>👁 <strong>アイ：</strong>深みのあるゴールド・モスグリーン・ターコイズグリーン<br>🌸 <strong>チーク：</strong>ディープオレンジ・アプリコット（ほお骨下に陰のように）<br>💋 <strong>リップ：</strong>レッドパプリカ・ラスト・くすんだオレンジ</div>
+      <div class="kp-label">▶ コーデのコツ</div>
+      <div class="kp-tags"><span class="kp-tag">茶・緑の類似系配色</span><span class="kp-tag">ワントーン・グラデ配色</span><span class="kp-tag">ゴールド（光沢なし）</span><span class="kp-tag">アンティーク調アクセ</span></div>
+      <div class="kp-tmpl">〇〇さんのパーソナルカラーはオータム（秋）です。イエローベースの深みのある複雑なカラーグループがよくお似合いになります。お肌は陶器のようにマットで滑らかで、モスグリーンやマスタード・コパーレッドなどの渋みのある色を身につけると血色が良くなり輪郭がすっきり引き締まって見えます。</div>
+    </div>
+
+    <!-- ウインター -->
+    <div class="kanpe-pnl" id="kp-wi">
+      <div class="kp-catch">❄️ ウインター｜ブルベ・クリア・クールな印象</div>
+      <div class="kp-label">▶ 特徴（肌・髪・瞳）</div>
+      <div class="note-item" style="margin-bottom:.3rem">肌：色白〜ダークベージュ（幅広い）・ツヤ感がある<br>髪：深みと艶のあるブラック・ハリ・コシ・ツヤ・直毛が多い<br>瞳：ダークブラウン・白目と黒目のコントラストがはっきり</div>
+      <div class="kp-label">▶ 得意な色</div>
+      <div class="kp-tags"><span class="kp-tag">トゥルーレッド</span><span class="kp-tag">マゼンタ</span><span class="kp-tag">エメラルドグリーン</span><span class="kp-tag">ロイヤルブルー</span><span class="kp-tag">ホワイト（純白）</span><span class="kp-tag">ロイヤルパープル</span><span class="kp-tag">フーシャ</span></div>
+      <div class="kp-label">▶ メイクのコツ</div>
+      <div class="note-item" style="margin-bottom:.3rem">💄 <strong>ファンデ：</strong>ツヤ感を部分的にでも<br>👁 <strong>アイ：</strong>アイシー系薄い色＋ロイヤルパープル・トゥルーグレイ<br>🌸 <strong>チーク：</strong>青みがかったピンク系・バーガンディ（ほお骨下にうっすら）<br>💋 <strong>リップ：</strong>ブルーレッド・トゥルーレッド・マゼンタ</div>
+      <div class="kp-label">▶ コーデのコツ</div>
+      <div class="kp-tags"><span class="kp-tag">強コントラスト（白×黒）</span><span class="kp-tag">モノトーンを着こなせる唯一のタイプ</span><span class="kp-tag">シルバー・プラチナ（光沢強）</span></div>
+      <div class="kp-tmpl">〇〇さんのパーソナルカラーはウインター（冬）です。ブルーベースのクリアでコントラストの強いカラーグループがよくお似合いになります。お肌にはツヤ感があり、トゥルーレッドやエメラルドグリーンなどの鮮やかでクリアな色を身につけると色白でシャープな輪郭が際立ち存在感が増します。</div>
+    </div>
   </div>
 </div>
 
@@ -282,7 +408,55 @@ h1{font-size:15px;font-weight:500;color:#666;letter-spacing:.05em;margin-bottom:
     </div>
   </div>
   <button onclick="genProposal()" style="width:100%;margin-top:.75rem;padding:12px;font-size:13px;font-weight:500;border-radius:10px;background:#1a1a18;color:#fff;border:none;cursor:pointer">✨ 提案文を生成</button>
+  <button onclick="openSaveModal()" style="width:100%;margin-top:.5rem;padding:12px;font-size:13px;font-weight:500;border-radius:10px;background:#4A3728;color:#EDE8E0;border:none;cursor:pointer;letter-spacing:.04em">📋 カルテに保存</button>
 </div>
+</div>
+
+<!-- カルテ保存モーダル -->
+<div id="save-modal"
+  onclick="if(event.target===this)closeSaveModal()"
+  style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.48);z-index:9999;align-items:center;justify-content:center">
+  <div style="background:#fff;border-radius:16px;padding:1.5rem;width:min(400px,94vw);box-shadow:0 12px 40px rgba(0,0,0,.22);display:flex;flex-direction:column;max-height:90vh">
+
+    <!-- ヘッダー -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-shrink:0">
+      <div style="font-size:14px;font-weight:600;color:#1a1a18">📋 診断結果をカルテに保存</div>
+      <button onclick="closeSaveModal()" style="background:none;border:none;cursor:pointer;font-size:20px;color:#bbb;line-height:1;padding:0 4px;font-family:inherit" aria-label="閉じる">×</button>
+    </div>
+
+    <!-- 診断内容プレビュー -->
+    <div id="sm-preview" style="background:#f5f4f0;border-radius:8px;padding:.55rem .85rem;font-size:11px;color:#666;line-height:1.9;margin-bottom:1rem;flex-shrink:0"></div>
+
+    <!-- 顧客選択 -->
+    <div style="font-size:12px;color:#888;margin-bottom:.45rem;flex-shrink:0">顧客を選択 <span style="color:#c82a2a">*</span></div>
+
+    <!-- 検索ボックス -->
+    <input id="sm-search" type="text" placeholder="名前で検索..."
+      oninput="filterKarteList()"
+      style="width:100%;padding:9px 12px;font-size:13px;border:.5px solid #ddd;border-radius:8px;margin-bottom:.6rem;outline:none;font-family:inherit;box-sizing:border-box;flex-shrink:0">
+
+    <!-- 顧客リスト -->
+    <div id="sm-list"
+      style="flex:1;overflow-y:auto;border:.5px solid #eee;border-radius:10px;min-height:120px;max-height:260px">
+      <div id="sm-list-inner" style="padding:.25rem 0"></div>
+    </div>
+
+    <!-- 結果メッセージ -->
+    <div id="sm-result" style="display:none;font-size:12px;padding:.5rem .75rem;border-radius:8px;margin-top:.75rem;flex-shrink:0"></div>
+
+    <!-- ボタン -->
+    <div style="display:flex;gap:.75rem;margin-top:.9rem;flex-shrink:0">
+      <button onclick="closeSaveModal()"
+        style="flex:1;padding:10px;font-size:13px;border-radius:8px;border:.5px solid #ddd;background:#fff;color:#666;cursor:pointer;font-family:inherit">
+        キャンセル
+      </button>
+      <button id="sm-submit" onclick="saveKarte()" disabled
+        style="flex:1;padding:10px;font-size:13px;font-weight:600;border-radius:8px;border:none;background:#ccc;color:#fff;cursor:not-allowed;font-family:inherit">
+        この顧客に保存
+      </button>
+    </div>
+
+  </div>
 </div>
 
 <script>
@@ -459,20 +633,11 @@ function buildMatrix(){
   cf();
 }
 
-function setManSH(sh){
-  manSH=sh;
-  document.getElementById('sh-s').classList.toggle('active',sh==='ソフト');
-  document.getElementById('sh-h').classList.toggle('active',sh==='ハード');
-  cf();
-}
 function setGender(g){
   gender=g;
   manSH=null;
   document.getElementById('gb-f').classList.toggle('active',g==='f');
   document.getElementById('gb-m').classList.toggle('active',g==='m');
-  document.getElementById('sh-select').style.display=g==='m'?'block':'none';
-  document.getElementById('sh-s').classList.remove('active');
-  document.getElementById('sh-h').classList.remove('active');
   buildMatrix();
 }
 function setAxis(ax){manualAxis=ax;document.querySelectorAll('.axbtn').forEach(b=>b.classList.toggle('active',b.textContent===ax));ur();}
@@ -591,6 +756,22 @@ function gsk(){
   const mx=Math.max(s,w,n);
   if(mx===0)return{t:'—',sc:0,s,w,n};
   return{t:s===mx?'ストレート':w===mx?'ウェーブ':'ナチュラル',sc:mx,s,w,n};
+}
+
+// 顔タイプスコアを副作用なしで計算（cf()はDOM更新も行うためここで再計算）
+function gfacescores(){
+  let cp=0,ap=0,cv=0,lp=0;
+  AI.forEach((_,i)=>{const v=rv('a'+i);if(v==='0')cp++;else if(v==='2')ap++;});
+  CI.forEach((it,i)=>{
+    if(it.two){
+      const vL=rv('c'+i+'L'),vR=rv('c'+i+'R');
+      if(vL==='0')cv+=it.p;else if(vL==='2')lp+=it.p;
+      if(vR==='0')cv+=it.p;else if(vR==='2')lp+=it.p;
+    } else {
+      const v=rv('c'+i);if(v==='0')cv+=it.p;else if(v==='2')lp+=it.p;
+    }
+  });
+  return{cp,ap,cv,lp};
 }
 
 function gseason(){
@@ -723,12 +904,23 @@ ${sk.t}骨格×${color}×${face}タイプのあなたは、${tips[0]||'素材と
   document.getElementById('proposal-area').style.display='block';
 }
 function swKanpe(name){
-  document.querySelectorAll('.kanpe-tab').forEach((t,i)=>{
-    const names=['drape','yb','bb','note'];
-    t.classList.toggle('active',names[i]===name);
+  document.querySelectorAll('#kanpe-card .kanpe-tab').forEach(t=>{
+    t.classList.toggle('active',t.getAttribute('data-kp')===name);
   });
-  document.querySelectorAll('.kanpe-pnl').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('#kanpe-card .kanpe-pnl').forEach(p=>p.classList.remove('active'));
   document.getElementById('kp-'+name).classList.add('active');
+}
+function toggleSkelKanpe(){
+  const body=document.getElementById('skel-kanpe-body');
+  const btn=document.getElementById('skel-kanpe-btn');
+  const visible=body.style.display!=='none';
+  body.style.display=visible?'none':'block';
+  btn.textContent=visible?'カンペを見る 📋':'カンペを閉じる ✕';
+}
+function swSkelKanpe(name){
+  document.querySelectorAll('.skel-ktab').forEach(t=>t.classList.toggle('active',t.getAttribute('data-skp')===name));
+  document.querySelectorAll('.skel-kpnl').forEach(p=>p.classList.remove('active'));
+  document.getElementById('skp-'+name).classList.add('active');
 }
 function toggleKanpe(){
   const card=document.getElementById('kanpe-card');
@@ -738,6 +930,201 @@ function toggleKanpe(){
   btn.textContent=visible?'カンペを見る 📋':'カンペを閉じる ✕';
 }
 bAge();bCur();bSk();buildMatrix();uc();
+
+// ─── カルテ保存 ──────────────────────────────────────────────
+const COLOR_MAP={
+  'スプリング':'イエベ春',
+  'サマー':'ブルベ夏',
+  'オータム':'イエベ秋',
+  'ウィンター':'ブルベ冬',
+};
+
+let _escHandler=null;
+let _saveTimer=null;
+let _karteList=[];       // 取得済み顧客一覧キャッシュ
+let _selectedKarteId=null; // 選択中の顧客 ID
+
+// 骨格診断17項目の個別回答を文字列化する（SKと同じ並び順で17文字。各文字はS/W/N/-）
+function gskAnswers(){
+  return SK.map((_,i)=>rv('sk'+i)||'-').join('');
+}
+
+// 診断結果＋数値スコアを取得するユーティリティ
+function getDiagnosisPayload(){
+  const sk=gsk();
+  const colorRaw=gseason();
+  const faceRaw=document.getElementById('face-m').textContent;
+  const fs=gfacescores();
+  const yb=parseInt(document.getElementById('yb').value)||0;
+  const br=parseInt(document.getElementById('br').value)||0;
+  const cl=parseInt(document.getElementById('cl').value)||0;
+  return {
+    // 診断結果（テキスト）
+    kokkakuResult:       sk.t==='—'?'':sk.t,
+    personalColorResult: COLOR_MAP[colorRaw]||'',
+    faceTypeResult:      faceRaw==='—'?'':faceRaw,
+    // 骨格スコア（各 0〜17）
+    kokkakuScoreS: sk.s,
+    kokkakuScoreW: sk.w,
+    kokkakuScoreN: sk.n,
+    // 骨格診断17項目の個別回答（レポート側で項目ごとの体の特徴を文章化するために使う）
+    kokkakuAnswers: gskAnswers(),
+    // カラースコア（各 0〜100）
+    colorScoreYb: yb,   // 0=イエベ 100=ブルベ
+    colorScoreBr: br,   // 0=明 100=暗
+    colorScoreCl: cl,   // 0=澄 100=くすみ
+    // 顔タイプスコア
+    faceScoreChild: fs.cp,  // 子供顔点数 0〜9
+    faceScoreAdult: fs.ap,  // 大人顔点数 0〜9
+    faceScoreCurve: fs.cv,  // 曲線点数 0〜15
+    faceScoreLine:  fs.lp,  // 直線点数 0〜15
+  };
+}
+
+// プレビュー文字列を生成
+function buildPreviewHTML(){
+  const sk=gsk(),colorRaw=gseason(),faceRaw=document.getElementById('face-m').textContent;
+  const colorMapped=COLOR_MAP[colorRaw]||'—';
+  const genderLabel=gender==='f'?'女性':gender==='m'?'男性':'—';
+  const na='<span style="color:#aaa">未入力</span>';
+  return '<b>骨格：</b>'+(sk.t==='—'?na:sk.t)+'　'+
+         '<b>カラー：</b>'+(colorMapped==='—'?na:colorMapped)+'　'+
+         '<b>顔タイプ：</b>'+(faceRaw==='—'?na:faceRaw)+'　'+
+         '<b>性別：</b>'+genderLabel;
+}
+
+// 顧客リストを描画する
+function renderKarteList(list){
+  const inner=document.getElementById('sm-list-inner');
+  if(list.length===0){
+    inner.innerHTML='<div style="padding:1.5rem;text-align:center;color:#aaa;font-size:12px">顧客が見つかりません</div>';
+    return;
+  }
+  inner.innerHTML=list.map(k=>{
+    const date=k.visitDate?k.visitDate.slice(0,10):'';
+    const sub=[k.gender,date].filter(Boolean).join(' · ');
+    return `<div class="sm-row" data-id="${k.id}" onclick="selectKarteRow('${k.id}')"
+      style="padding:.65rem 1rem;cursor:pointer;border-bottom:.5px solid #f0f0ee;transition:background .1s">
+      <div style="font-size:13px;font-weight:500;color:#1a1a18">${k.clientName}</div>
+      ${sub?`<div style="font-size:11px;color:#aaa;margin-top:1px">${sub}</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+// 顧客リストを検索ワードでフィルタ
+function filterKarteList(){
+  const q=document.getElementById('sm-search').value.trim().toLowerCase();
+  renderKarteList(q?_karteList.filter(k=>k.clientName.toLowerCase().includes(q)):_karteList);
+  // フィルタ後も選択状態を復元
+  if(_selectedKarteId) highlightRow(_selectedKarteId);
+}
+
+// 行の選択ハイライト
+function highlightRow(id){
+  document.querySelectorAll('.sm-row').forEach(el=>{
+    const sel=el.getAttribute('data-id')===id;
+    el.style.background=sel?'#f0ebe6':'';
+    el.style.fontWeight=sel?'600':'';
+  });
+}
+
+// 顧客を選択
+function selectKarteRow(id){
+  _selectedKarteId=id;
+  highlightRow(id);
+  const btn=document.getElementById('sm-submit');
+  btn.disabled=false;
+  btn.style.background='#4A3728';
+  btn.style.color='#EDE8E0';
+  btn.style.cursor='pointer';
+}
+
+async function openSaveModal(){
+  if(_saveTimer){clearTimeout(_saveTimer);_saveTimer=null;}
+  _selectedKarteId=null;
+
+  // プレビュー更新
+  document.getElementById('sm-preview').innerHTML=buildPreviewHTML();
+
+  // フォームリセット
+  document.getElementById('sm-search').value='';
+  document.getElementById('sm-result').style.display='none';
+  const btn=document.getElementById('sm-submit');
+  btn.disabled=true;
+  btn.style.background='#ccc';
+  btn.style.color='#fff';
+  btn.style.cursor='not-allowed';
+  btn.textContent='この顧客に保存';
+
+  // リスト領域をローディング状態に
+  document.getElementById('sm-list-inner').innerHTML=
+    '<div style="padding:1.5rem;text-align:center;color:#aaa;font-size:12px">読み込み中...</div>';
+
+  // モーダル表示
+  document.getElementById('save-modal').style.display='flex';
+  if(!_escHandler){
+    _escHandler=e=>{if(e.key==='Escape')closeSaveModal();};
+    document.addEventListener('keydown',_escHandler);
+  }
+  setTimeout(()=>document.getElementById('sm-search').focus(),80);
+
+  // 顧客一覧を取得
+  try{
+    const res=await fetch('https://karte-app-ivory.vercel.app/api/karte');
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    _karteList=await res.json();
+    renderKarteList(_karteList);
+  }catch(e){
+    document.getElementById('sm-list-inner').innerHTML=
+      '<div style="padding:1rem;color:#c82a2a;font-size:12px">接続エラー：カルテアプリに接続できませんでした。しばらくしてから再度お試しください</div>';
+  }
+}
+
+function closeSaveModal(){
+  if(_saveTimer){clearTimeout(_saveTimer);_saveTimer=null;}
+  document.getElementById('save-modal').style.display='none';
+  document.getElementById('sm-search').blur();
+  if(_escHandler){
+    document.removeEventListener('keydown',_escHandler);
+    _escHandler=null;
+  }
+}
+
+async function saveKarte(){
+  if(!_selectedKarteId) return;
+
+  const payload=getDiagnosisPayload();
+  const btn=document.getElementById('sm-submit');
+  const resEl=document.getElementById('sm-result');
+  btn.disabled=true;
+  btn.textContent='保存中…';
+  resEl.style.display='none';
+
+  try{
+    const res=await fetch(`https://karte-app-ivory.vercel.app/api/karte/${_selectedKarteId}`,{
+      method:'PATCH',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(payload),
+    });
+    if(res.ok){
+      resEl.style.cssText='display:block;background:#e8fce8;color:#2a8c2a;padding:.5rem .75rem;border-radius:8px;font-size:12px';
+      resEl.textContent='✓ 診断結果をカルテに保存しました';
+      btn.textContent='保存しました ✓';
+      _saveTimer=setTimeout(()=>{_saveTimer=null;closeSaveModal();},1800);
+    }else{
+      const err=await res.json().catch(()=>({}));
+      resEl.style.cssText='display:block;background:#fde8e8;color:#c82a2a;padding:.5rem .75rem;border-radius:8px;font-size:12px';
+      resEl.textContent='保存に失敗しました：'+(err.error||'エラー '+res.status);
+      btn.disabled=false;
+      btn.textContent='この顧客に保存';
+    }
+  }catch(e){
+    resEl.style.cssText='display:block;background:#fde8e8;color:#c82a2a;padding:.5rem .75rem;border-radius:8px;font-size:12px';
+    resEl.textContent='接続エラー：カルテアプリに接続できませんでした。しばらくしてから再度お試しください';
+    btn.disabled=false;
+    btn.textContent='この顧客に保存';
+  }
+}
 </script>
 </body>
 </html>
