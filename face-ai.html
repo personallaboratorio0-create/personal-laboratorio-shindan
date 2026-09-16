@@ -152,6 +152,12 @@ header span{font-size:11px;color:var(--accent2);letter-spacing:.1em;font-family:
     <button class="axis-tab" onclick="swAxis('color')">カラー</button>
   </div>
 
+  <!-- カルテに保存 -->
+  <div class="card" style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+    <div style="font-size:12px;color:var(--accent2);font-family:'Noto Sans JP',sans-serif">判定済みの結果・写真をカルテに保存できます</div>
+    <button onclick="openSaveModal()" style="padding:10px 20px;font-size:13px;font-weight:500;border-radius:6px;background:var(--text);color:var(--white);border:none;cursor:pointer;white-space:nowrap;font-family:'Noto Sans JP',sans-serif">📋 カルテに保存</button>
+  </div>
+
   <!-- 顔タイプパネル -->
   <div class="axis-pnl active" id="ap-face">
 
@@ -600,6 +606,7 @@ async function analyzeSkel(){
   }
 }
 function showSkelResult(r){
+  lastSkResult=r;
   document.getElementById('r-sk-type').textContent=r.skelType||'—';
   document.getElementById('r-sk-conf').textContent='確信度：'+(r.confidence||'—');
   const sc=r.scores||{};
@@ -677,6 +684,7 @@ async function analyzeColor(){
   }
 }
 function showColorResult(r){
+  lastColorResult=r;
   document.getElementById('r-co-type').textContent=r.season||'—';
   document.getElementById('r-co-conf').textContent='確信度：'+(r.confidence||'—');
   const ax=r.axes||{};
@@ -935,6 +943,7 @@ ${gender==='m'?`- 子供顔 × 曲線 → チャーミング（ハード or ソ�
 }
 
 function showResult(r){
+  lastFaceResult=r;
   // バッジ
   document.getElementById('r-type').textContent=r.faceType||'—';
   document.getElementById('r-confidence').textContent='確信度：'+(r.confidence||'—');
@@ -986,6 +995,223 @@ function showResult(r){
   document.getElementById('result-area').classList.add('active');
   document.getElementById('result-area').scrollIntoView({behavior:'smooth'});
 }
+
+// ─── カルテ保存 ───────────────────────────────────────────
+const COLOR_MAP={
+  'スプリング':'イエベ春',
+  'サマー':'ブルベ夏',
+  'オータム':'イエベ秋',
+  'ウィンター':'ブルベ冬',
+};
+
+let lastFaceResult=null, lastSkResult=null, lastColorResult=null;
+let _escHandlerFA=null;
+let _saveTimerFA=null;
+let _karteListFA=[];
+let _selectedKarteIdFA=null;
+
+const KARTE_API_BASE='https://karte-app-ivory.vercel.app';
+
+function buildSavePreviewHTML(){
+  const parts=[];
+  if(lastFaceResult) parts.push('<b>顔タイプ：</b>'+lastFaceResult.faceType);
+  if(lastSkResult)   parts.push('<b>骨格：</b>'+lastSkResult.skelType);
+  if(lastColorResult)parts.push('<b>カラー：</b>'+(COLOR_MAP[lastColorResult.season]||lastColorResult.season));
+  const photoCount=(imgFileFront?1:0)+(imgFileSide?1:0)+(skFiles['sk-front']?1:0)+(skFiles['sk-side']?1:0)+(skFiles['sk-hand']?1:0)+(coFile?1:0);
+  parts.push('<b>写真：</b>'+photoCount+'枚');
+  if(parts.length===1) return '<span style="color:#aaa">まだ判定結果がありません</span>';
+  return parts.join('　');
+}
+
+function renderKarteListFA(list){
+  const inner=document.getElementById('sm-list-inner-fa');
+  if(list.length===0){
+    inner.innerHTML='<div style="padding:1.5rem;text-align:center;color:#aaa;font-size:12px">顧客が見つかりません</div>';
+    return;
+  }
+  inner.innerHTML=list.map(k=>{
+    const date=k.visitDate?k.visitDate.slice(0,10):'';
+    const sub=[k.gender,date].filter(Boolean).join(' · ');
+    return `<div class="sm-row-fa" data-id="${k.id}" onclick="selectKarteRowFA('${k.id}')"
+      style="padding:.65rem 1rem;cursor:pointer;border-bottom:.5px solid #f0f0ee;transition:background .1s">
+      <div style="font-size:13px;font-weight:500;color:#1a1a18">${k.clientName}</div>
+      ${sub?`<div style="font-size:11px;color:#aaa;margin-top:1px">${sub}</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+function filterKarteListFA(){
+  const q=document.getElementById('sm-search-fa').value.trim().toLowerCase();
+  renderKarteListFA(q?_karteListFA.filter(k=>k.clientName.toLowerCase().includes(q)):_karteListFA);
+  if(_selectedKarteIdFA) highlightRowFA(_selectedKarteIdFA);
+}
+
+function highlightRowFA(id){
+  document.querySelectorAll('.sm-row-fa').forEach(el=>{
+    const sel=el.getAttribute('data-id')===id;
+    el.style.background=sel?'#f0ebe6':'';
+    el.style.fontWeight=sel?'600':'';
+  });
+}
+
+function selectKarteRowFA(id){
+  _selectedKarteIdFA=id;
+  highlightRowFA(id);
+  const btn=document.getElementById('sm-submit-fa');
+  btn.disabled=false;
+  btn.style.background='#4A3728';
+  btn.style.color='#EDE8E0';
+  btn.style.cursor='pointer';
+}
+
+async function openSaveModal(){
+  if(_saveTimerFA){clearTimeout(_saveTimerFA);_saveTimerFA=null;}
+  _selectedKarteIdFA=null;
+
+  document.getElementById('sm-preview-fa').innerHTML=buildSavePreviewHTML();
+  document.getElementById('sm-search-fa').value='';
+  document.getElementById('sm-result-fa').style.display='none';
+  const btn=document.getElementById('sm-submit-fa');
+  btn.disabled=true;
+  btn.style.background='#ccc';
+  btn.style.color='#fff';
+  btn.style.cursor='not-allowed';
+  btn.textContent='この顧客に保存';
+
+  document.getElementById('sm-list-inner-fa').innerHTML=
+    '<div style="padding:1.5rem;text-align:center;color:#aaa;font-size:12px">読み込み中...</div>';
+
+  document.getElementById('save-modal-fa').style.display='flex';
+  if(!_escHandlerFA){
+    _escHandlerFA=e=>{if(e.key==='Escape')closeSaveModal();};
+    document.addEventListener('keydown',_escHandlerFA);
+  }
+  setTimeout(()=>document.getElementById('sm-search-fa').focus(),80);
+
+  try{
+    const res=await fetch(`${KARTE_API_BASE}/api/karte`);
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    _karteListFA=await res.json();
+    renderKarteListFA(_karteListFA);
+  }catch(e){
+    document.getElementById('sm-list-inner-fa').innerHTML=
+      '<div style="padding:1rem;color:#c82a2a;font-size:12px">接続エラー：カルテアプリに接続できませんでした。しばらくしてから再度お試しください</div>';
+  }
+}
+
+function closeSaveModal(){
+  if(_saveTimerFA){clearTimeout(_saveTimerFA);_saveTimerFA=null;}
+  document.getElementById('save-modal-fa').style.display='none';
+  document.getElementById('sm-search-fa').blur();
+  if(_escHandlerFA){
+    document.removeEventListener('keydown',_escHandlerFA);
+    _escHandlerFA=null;
+  }
+}
+
+async function saveToKarte(){
+  if(!_selectedKarteIdFA) return;
+  const btn=document.getElementById('sm-submit-fa');
+  const resEl=document.getElementById('sm-result-fa');
+  btn.disabled=true;
+  btn.textContent='保存中…';
+  resEl.style.display='none';
+
+  try{
+    // 既存の診断結果を取得し、未診断の軸を上書きしないようマージする
+    const cur=await fetch(`${KARTE_API_BASE}/api/karte/${_selectedKarteIdFA}`).then(r=>r.json());
+
+    const diagnosisPayload={
+      kokkakuResult:       lastSkResult    ? lastSkResult.skelType            : (cur.kokkakuResult||''),
+      personalColorResult: lastColorResult ? (COLOR_MAP[lastColorResult.season]||'') : (cur.personalColorResult||''),
+      faceTypeResult:      lastFaceResult  ? lastFaceResult.faceType          : (cur.faceTypeResult||''),
+    };
+    const diagRes=await fetch(`${KARTE_API_BASE}/api/karte/${_selectedKarteIdFA}`,{
+      method:'PATCH',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(diagnosisPayload),
+    });
+    if(!diagRes.ok){
+      const errBody=await diagRes.json().catch(()=>({}));
+      throw new Error('診断結果の保存に失敗しました: '+(errBody.error||('HTTP '+diagRes.status)));
+    }
+
+    // 写真をアップロード（あるものだけ）。
+    // サーバー側は 'photos' という項目名で受け取る仕様のため、それに合わせる。
+    // また、複数枚まとめて1回で送るとサーバー側のリクエストサイズ上限を超えて
+    // 失敗する（Failed to fetch）ことがあるため、1枚ずつ順番に送る。
+    const photoFiles=[];
+    if(imgFileFront) photoFiles.push(imgFileFront);
+    if(imgFileSide) photoFiles.push(imgFileSide);
+    if(skFiles['sk-front']) photoFiles.push(skFiles['sk-front']);
+    if(skFiles['sk-side']) photoFiles.push(skFiles['sk-side']);
+    if(skFiles['sk-hand']) photoFiles.push(skFiles['sk-hand']);
+    if(coFile) photoFiles.push(coFile);
+
+    for(const file of photoFiles){
+      const form=new FormData();
+      form.append('photos',file);
+      const photoRes=await fetch(`${KARTE_API_BASE}/api/karte/${_selectedKarteIdFA}/photos`,{
+        method:'POST',
+        body:form,
+      });
+      if(!photoRes.ok){
+        const errBody=await photoRes.json().catch(()=>({}));
+        throw new Error('写真の保存に失敗しました: '+(errBody.error||('HTTP '+photoRes.status)));
+      }
+    }
+
+    resEl.style.cssText='display:block;background:#e8fce8;color:#2a8c2a;padding:.5rem .75rem;border-radius:8px;font-size:12px';
+    resEl.textContent='✓ 診断結果・写真をカルテに保存しました';
+    btn.textContent='保存しました ✓';
+    _saveTimerFA=setTimeout(()=>{_saveTimerFA=null;closeSaveModal();},1800);
+  }catch(e){
+    resEl.style.cssText='display:block;background:#fce8e8;color:#c82a2a;padding:.5rem .75rem;border-radius:8px;font-size:12px';
+    resEl.textContent='✗ '+e.message;
+    btn.disabled=false;
+    btn.textContent='この顧客に保存';
+  }
+}
 </script>
+
+<!-- カルテ保存モーダル -->
+<div id="save-modal-fa"
+  onclick="if(event.target===this)closeSaveModal()"
+  style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.48);z-index:9999;align-items:center;justify-content:center">
+  <div style="background:#fff;border-radius:16px;padding:1.5rem;width:min(400px,94vw);box-shadow:0 12px 40px rgba(0,0,0,.22);display:flex;flex-direction:column;max-height:90vh">
+
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-shrink:0">
+      <div style="font-size:14px;font-weight:600;color:#1a1a18">📋 診断結果をカルテに保存</div>
+      <button onclick="closeSaveModal()" style="background:none;border:none;cursor:pointer;font-size:20px;color:#bbb;line-height:1;padding:0 4px;font-family:inherit" aria-label="閉じる">×</button>
+    </div>
+
+    <div id="sm-preview-fa" style="background:#f5f4f0;border-radius:8px;padding:.55rem .85rem;font-size:11px;color:#666;line-height:1.9;margin-bottom:1rem;flex-shrink:0"></div>
+
+    <div style="font-size:12px;color:#888;margin-bottom:.45rem;flex-shrink:0">顧客を選択 <span style="color:#c82a2a">*</span></div>
+
+    <input id="sm-search-fa" type="text" placeholder="名前で検索..."
+      oninput="filterKarteListFA()"
+      style="width:100%;padding:9px 12px;font-size:13px;border:.5px solid #ddd;border-radius:8px;margin-bottom:.6rem;outline:none;font-family:inherit;box-sizing:border-box;flex-shrink:0">
+
+    <div id="sm-list-fa"
+      style="flex:1;overflow-y:auto;border:.5px solid #eee;border-radius:10px;min-height:120px;max-height:260px">
+      <div id="sm-list-inner-fa" style="padding:.25rem 0"></div>
+    </div>
+
+    <div id="sm-result-fa" style="display:none;font-size:12px;padding:.5rem .75rem;border-radius:8px;margin-top:.75rem;flex-shrink:0"></div>
+
+    <div style="display:flex;gap:.75rem;margin-top:.9rem;flex-shrink:0">
+      <button onclick="closeSaveModal()"
+        style="flex:1;padding:10px;font-size:13px;border-radius:8px;border:.5px solid #ddd;background:#fff;color:#666;cursor:pointer;font-family:inherit">
+        キャンセル
+      </button>
+      <button id="sm-submit-fa" onclick="saveToKarte()" disabled
+        style="flex:1;padding:10px;font-size:13px;font-weight:600;border-radius:8px;border:none;background:#ccc;color:#fff;cursor:not-allowed;font-family:inherit">
+        この顧客に保存
+      </button>
+    </div>
+
+  </div>
+</div>
 </body>
 </html>
